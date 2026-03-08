@@ -1,0 +1,26 @@
+import PluginVariables as msqcvar;
+
+
+const objectN = 200;
+const size = 30;
+const buffer = EUDArray(objectN*size);
+
+const offset = EUDArray(objectN);
+var remaing = objectN;
+
+
+function init() {
+    for (var i = 0; i < objectN; i++) {
+        offset[i] = 4 * size * i;
+    }
+}
+
+function alloc(): EUDArray {
+    remaing -= 1;
+    return buffer + offset[remaing];
+}
+
+function free(array) {
+    offset[remaing] = array - buffer;
+    remaing += 1;
+}

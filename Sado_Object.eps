@@ -1,0 +1,320 @@
+import PluginVariables as msqcvar;
+
+
+import System as sy;
+import ArrayPool as ap;
+
+
+const NOCOMBO = 99;
+const YESCOMBO = 30;
+
+
+
+const death_Maxtime = [0, 
+                       12, 14, 6, 24, 
+                       16, 20*24, 72, 6, 
+                       20, 36, 
+                       130, 
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const death_Maxtime_Enhance = [0, 
+                               12, 14, 6, 34, 
+                               16, 30*24, 104, 6, 
+                               20, 50, 
+                               170, 
+                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const death_canCombo = [NOCOMBO, //시작점
+                        YESCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, //Q
+                        YESCOMBO, 9, NOCOMBO, 9, //W
+                        YESCOMBO, NOCOMBO,             //E
+                        NOCOMBO,                   //R
+                        NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO];
+const death_canCombo_Enhance = 
+                       [NOCOMBO, //시작점
+                        YESCOMBO, YESCOMBO, NOCOMBO, NOCOMBO, //Q
+                        YESCOMBO, 9, NOCOMBO, 9, //W
+                        YESCOMBO, NOCOMBO,             //E
+                        NOCOMBO,                   //R
+                        NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO];
+//역병의 사도
+const plague_Maxtime = [0, 
+                       (5+1)*12, (4+1)*12, (3+1)*12, 12, 
+                       16, 20*24, 72, 6, 
+                       8, 36, 
+                       130, 
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const plague_Maxtime_Enhance = [0, 
+                               12, 14, 6, 34, 
+                               16, 30*24, 104, 6, 
+                               20, 50, 
+                               170, 
+                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const plague_canCombo = [NOCOMBO, //시작점
+                        YESCOMBO, YESCOMBO, NOCOMBO, NOCOMBO, //Q
+                        YESCOMBO, 9, NOCOMBO, 9, //W
+                        YESCOMBO, NOCOMBO,             //E
+                        NOCOMBO,                   //R
+                        NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO];
+const plague_canCombo_Enhance = 
+                       [NOCOMBO, //시작점
+                        YESCOMBO, YESCOMBO, NOCOMBO, NOCOMBO, //Q
+                        YESCOMBO, 9, NOCOMBO, 9, //W
+                        YESCOMBO, NOCOMBO,             //E
+                        NOCOMBO,                   //R
+                        NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO];
+
+object Skill_Info {
+    var type; //스킬 번호
+    var timer; //스킬 타이머
+    var maxtime; //스킬 최대 타이머
+    var isEnhance; //스킬 강화 여부
+    var isActived; //스킬 활성화 여부
+};
+
+object Sado {
+    var type; //영웅타입 1: 죽음 2: 역병 3: 파괴 4: 승리 5: 신의 6: 역천
+    var isAlive; //영웅 생존 여부
+    var epd; //영웅 유닛의 EPD
+    var curSkillCombo; //현재의 스킬 콤보
+    var comboTimer; //스킬 콤보 타이머
+    var info: EUDArray; //스킬 정보 배열 30개만큼
+    var skillList: EUDArray; //스킬 리스트
+    var skillListIndex; //스킬 리스트 인덱스
+    var group_Order; //하수인 명령 타입
+
+    function constructor() {
+        this.info = ap.alloc();
+        this.skillList = ap.alloc();
+        this.skillListIndex = 0;
+        for (var i = 0; i < ap.size; i++) {
+            this.info[i] = Skill_Info.alloc();
+        }
+    }
+    function Skill(cp, Num) {
+        var combo = this.curSkillCombo;
+        var cond = 0;
+        switch (this.type) {
+            case 1: //죽음
+                if (combo == 0)
+                {
+                    //스킬 미발동 시
+                    if (Num == 1) 
+                    {
+                        //Q스킬 발동
+                        this.curSkillCombo = 1;
+                        cond = true;
+                    }
+                    else if (Num == 2) 
+                    {
+                        //W스킬 발동
+                        this.curSkillCombo = 5;
+                        cond = true;
+                    }
+                    else if (Num == 3)
+                    {
+                        //E스킬 발동
+                        this.curSkillCombo = 9;
+                        cond = true;
+                    }
+                    else if (Num == 4)
+                    {
+                        //R스킬 발동
+                        this.curSkillCombo = 11;
+                        cond = true;
+                    }
+                }
+                else if (combo == 1)
+                {
+                    //Q스킬 발동 시
+                    if (Num == 1)
+                    {
+                        //Q-Q스킬 발동
+                        this.curSkillCombo = 2;
+                        cond = true;
+                    }
+                    else if (Num == 2)
+                    {
+                        //Q-W스킬 발동
+                        this.curSkillCombo = 3;
+                        cond = true;
+                    }
+                    else if (Num == 3)
+                    {
+                        //Q-E스킬 발동
+                        this.curSkillCombo = 4;
+                        cond = true;
+                    }
+                }
+                else if (combo == 5)
+                {
+                    //W스킬 발동 시
+                    if (Num == 1)
+                    {
+                        //W-Q스킬 발동
+                        this.curSkillCombo = 6;
+                        cond = true;
+                    }
+                    else if (Num == 2)
+                    {
+                        //W-W스킬 발동
+                        this.curSkillCombo = 7;
+                        cond = true;
+                    }
+                    else if (Num == 3)
+                    {
+                        //W-E스킬 발동
+                        this.curSkillCombo = 8;
+                        cond = true;
+                    }
+                }
+                else if (combo == 9)
+                {
+                    //E스킬 발동 시
+                    if (Num == 3)
+                    {
+                        //E-E스킬 발동
+                        this.curSkillCombo = 10;
+                        cond = true;
+                    }
+                }
+                break;
+            case 2: //역병
+                if (combo == 0)
+                {
+                    //스킬 미발동 시
+                    if (Num == 1) 
+                    {
+                        //Q스킬 발동
+                        this.curSkillCombo = 1;
+                        cond = true;
+                    }
+                    else if (Num == 2) 
+                    {
+                        //W스킬 발동
+                        this.curSkillCombo = 5;
+                        cond = true;
+                    }
+                    else if (Num == 3)
+                    {
+                        //E스킬 발동
+                        this.curSkillCombo = 9;
+                        cond = true;
+                    }
+                    else if (Num == 4)
+                    {
+                        //R스킬 발동
+                        this.curSkillCombo = 11;
+                        cond = true;
+                    }
+                }
+                else if (combo == 1)
+                {
+                    //Q스킬 발동 시
+                    if (Num == 1)
+                    {
+                        //Q-Q스킬 발동
+                        this.curSkillCombo = 2;
+                        cond = true;
+                    }
+                    else if (Num == 2)
+                    {
+                        //Q-W스킬 발동
+                        this.curSkillCombo = 3;
+                        cond = true;
+                    }
+                    else if (Num == 3)
+                    {
+                        //Q-E스킬 발동
+                        this.curSkillCombo = 4;
+                        cond = true;
+                    }
+                }
+                else if (combo == 5)
+                {
+                    //W스킬 발동 시
+                    if (Num == 1)
+                    {
+                        //W-Q스킬 발동
+                        this.curSkillCombo = 6;
+                        cond = true;
+                    }
+                    else if (Num == 2)
+                    {
+                        //W-W스킬 발동
+                        this.curSkillCombo = 7;
+                        cond = true;
+                    }
+                    else if (Num == 3)
+                    {
+                        //W-E스킬 발동
+                        this.curSkillCombo = 8;
+                        cond = true;
+                    }
+                }
+                else if (combo == 9)
+                {
+                    //E스킬 발동 시
+                    if (Num == 3)
+                    {
+                        //E-E스킬 발동
+                        this.curSkillCombo = 10;
+                        cond = true;
+                    }
+                }
+                break;
+        
+            default:
+                break;
+        }
+        if (!cond) return false;
+        combo = this.curSkillCombo;
+        const info = Skill_Info.cast(this.info[combo]);
+        info.isActived = true;
+        if (info.isEnhance) this.comboTimer = death_canCombo_Enhance[combo];
+        else this.comboTimer = death_canCombo[combo];
+        return true;
+    }
+    function ComboSetting(i) {
+        const info = Skill_Info.cast(this.info[i]);
+        info.timer = 0;
+        info.isActived = false;
+        if (this.comboTimer == YESCOMBO)
+        {
+            //다음 콤보가 있다면 콤보 타이머 여유를 주고 스킬 비활성화 상태로 만들기
+            this.comboTimer = 6;
+        } 
+        else if (this.comboTimer == NOCOMBO) { 
+            //다음 콤보가 없다면 콤보 타이머를 없애고 스킬 비활성화 상태로 만들기
+            this.comboTimer = 0;
+            this.curSkillCombo = 0;
+        }
+    }
+    function Skill_Enhance(type_) {
+        const info = Skill_Info.cast(this.info[type_]);
+        if (info.isEnhance) return false; //이미 강화된 상태라면 패스
+        info.isEnhance = true;
+        info.maxtime = death_Maxtime_Enhance[type_];
+        return true;
+    }
+};
+function Skill_Info_init(sado: Sado) {
+    switch (sado.type) {
+        case 1: //죽음
+            for (var i = 0; i < ap.size; i++) {
+                const info = Skill_Info.cast(sado.info[i]);
+                info.type = i;
+                info.maxtime = death_Maxtime[i];
+                info.isEnhance = false;
+            }
+            break;
+        case 2: //역병
+            for (var i = 0; i < ap.size; i++) {
+                const info = Skill_Info.cast(sado.info[i]);
+                info.type = i;
+                info.maxtime = plague_Maxtime[i];
+                info.isEnhance = false;
+            }
+            break;
+        default:
+            break;
+    }
+}

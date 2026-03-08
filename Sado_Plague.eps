@@ -1,0 +1,1336 @@
+import PluginVariables as msqcvar;
+import System as sy;
+import TriggerEditor.TETools as TE;
+import Sado_Object as sdo;
+import draw as dw;
+import ScData as sc;
+
+const Death_Q_Cross_dx = EUDArray(4);
+const Death_Q_Cross_dy = EUDArray(4);
+const Death_Q_Straight_dx = EUDArray(4);
+const Death_Q_Straight_dy = EUDArray(4);
+const Death_Circle_32 = dw.Circle("Target", 32, dots=16);
+const Death_Circle_64 = dw.Circle("Target", 64, dots=16);
+const Death_Circle_96 = dw.Circle("Target", 96, dots=16);
+const Death_Circle_128 = dw.Circle("Target", 128, dots=16);
+const Death_Square_3 = dw.RegularPolygon("Target", 4, 68, dots=8, rotation=-45);
+const Death_Square_5 = dw.RegularPolygon("Target", 4, 136, dots=16, rotation=-45);
+const Death_Square_7 = dw.RegularPolygon("Target", 4, 204, dots=24, rotation=-45);
+const Death_Square_9 = dw.RegularPolygon("Target", 4, 272, dots=32, rotation=-45);
+const Death_Square_11 = dw.RegularPolygon("Target", 4, 339, dots=40, rotation=-45);
+const Death_Square_13 = dw.RegularPolygon("Target", 4, 407, dots=48, rotation=-45);
+const Death_Square_15 = dw.RegularPolygon("Target", 4, 475, dots=56, rotation=-45);
+
+const Death_SkillGroup = UnitGroup(500);
+const Death_MinionGroup_Main = UnitGroup(500);
+const Death_MinionGroup_FOB_1 = UnitGroup(500);
+const Death_MinionGroup_FOB_2 = UnitGroup(500);
+const Death_MinionGroup_FOB_3 = UnitGroup(500);
+var minion_Cost = 800;
+var Death_GroupControl = 0;
+
+const targetLoc = $L("Target");
+const bufferLoc = $L("Buffer");
+const searchLoc = $L("Skill_Range");
+const tempLoc = $L("Temp");
+const heroLoc = $L("Hero");
+const centerLoc = $L("Anywhere");
+const hero_Unit = TrgUnit(0);
+const skill_Unit_1 = TrgUnit(8);
+const skill_Unit_1_Sprite = Sprite(280);
+const skill_Unit_1_Weapon_G = Weapon(48);
+const skill_Unit_1_Weapon_A = Weapon(48);
+const skill_Unit_1_Weapon_G_Sprite = Sprite(358);
+const skill_Unit_1_Weapon_A_Sprite = Sprite(358);
+const skill_Unit_2 = TrgUnit(10);
+const skill_Unit_2_Sprite = Sprite(281);
+const skill_Unit_2_Weapon_G = Weapon(49);
+const skill_Unit_2_Weapon_A = Weapon(49);
+const skill_Unit_2_Weapon_G_Sprite = Sprite(359);
+const skill_Unit_2_Weapon_A_Sprite = Sprite(359);
+const effect_Unit = TrgUnit(9);
+const effect_Unit_Sprite = Sprite(279);
+const dummyUnit = TrgUnit(204);
+const wall_Unit = TrgUnit(128);
+
+const death_Minion_Unit = TrgUnit(11);
+const death_Minion_Unit_Weapon = Weapon(21);
+
+const color_Black = 0;
+const color_Violet = 14;
+const color_Brown = 16;
+const color_Wine = 23;
+const color_PeachD = 24;
+const color_PeachF = 31;
+const color_ArmyD = 34;
+const color_ArmyF = 39;
+const color_IndigoD = 40;
+const color_BlueD = 42;
+const color_CyanL = 52;
+const color_BlueL = 53;
+const color_YellowL = 61;
+const color_White = 84;
+const color_Red = 111;
+const color_GreenL = 117;
+const color_Yellow = 135;
+const color_Orange = 156;
+const color_Army = 157;
+const color_Green = 159;
+const color_Purple = 164;
+const color_Blue = 165;
+const array_ColorLine_Dark = [color_Black, color_ArmyD, color_Army, color_ArmyF, color_IndigoD, color_BlueD, color_Blue, color_BlueL];
+const acc_Square = EUDArray(4);
+const pos_Square = EUDArray(4);
+
+function init_death() {
+    for (var i = 0; i < 4; i++) {
+        Death_Q_Cross_dx[i], Death_Q_Cross_dy[i] = lengthdir(68, 45 + i*90);
+        Death_Q_Straight_dx[i], Death_Q_Straight_dy[i] = lengthdir(68, i*90);
+    }
+}
+function Unit_Color_Change(cp, epd, color) {
+    const Ncp = cp+8;
+    TE.SetUnitColorEPD(epd, Ncp);
+    TE.SetPColor(Ncp, color);
+}
+
+function Death_UnitSetting_Reset() {
+    sc.Reset_Change(effect_Unit_Sprite);
+    sc.Reset_Change(skill_Unit_1_Sprite);
+    sc.Reset_Change(skill_Unit_2_Sprite);
+    sc.Reset_Change(skill_Unit_1_Weapon_G_Sprite);
+    sc.Reset_Change(skill_Unit_2_Weapon_G_Sprite);
+}
+
+function Death_UnitSetting(cp, type, isEnhance) {
+    switch (type) {
+        case 1: 
+            skill_Unit_1.seekRange = 5;
+            skill_Unit_1_Sprite.image = sc.image_Mutal;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_1_Weapon_G.damage = 17;
+            skill_Unit_1_Weapon_G.damageBonus = 3;
+            skill_Unit_1_Weapon_G_Sprite.image = sc.image_Glave;
+            skill_Unit_1_Weapon_G.maxRange = 5*32;
+            skill_Unit_1_Weapon_G.behavior = sc.behavior_Instant;
+            skill_Unit_1_Weapon_G.explosionType = sc.explosion_Basic;
+            skill_Unit_1_Weapon_G.splashInnerRadius = 0;
+            skill_Unit_1_Weapon_G.splashMiddleRadius = 0;
+            skill_Unit_1_Weapon_G.splashOuterRadius = 0;
+
+            skill_Unit_2.seekRange = 8;
+            skill_Unit_2.buildingDimensions = 0;
+            skill_Unit_2_Sprite.image = sc.image_Mutal;
+            skill_Unit_2_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_2_Weapon_A.damage = 0;
+            skill_Unit_2_Weapon_A.damageBonus = 0;
+            skill_Unit_2_Weapon_A.flingy.topSpeed = 50000;
+            skill_Unit_2_Weapon_A.flingy.acceleration = 5000;
+            skill_Unit_2_Weapon_A.flingy.turnRadius = 127;
+            skill_Unit_2_Weapon_A_Sprite.image = sc.image_Queen;
+            skill_Unit_2_Weapon_A_Sprite.image.iscript = sc.iscript_Venom;
+            skill_Unit_2_Weapon_A_Sprite.image.drawingFunction = sc.drawing_Black;
+            skill_Unit_2_Weapon_A.maxRange = 8*32;
+            skill_Unit_2_Weapon_A.behavior = sc.behavior_Targetunit;
+            skill_Unit_2_Weapon_A.explosionType = sc.explosion_Basic;
+            skill_Unit_2_Weapon_A.splashInnerRadius = 0;
+            skill_Unit_2_Weapon_A.splashMiddleRadius = 0;
+            skill_Unit_2_Weapon_A.splashOuterRadius = 0;
+            if (isEnhance)
+            {
+                skill_Unit_1.seekRange = 8;
+                skill_Unit_1_Weapon_G.maxRange = 8*32;
+                skill_Unit_2_Weapon_A.damage = 20;
+                skill_Unit_2_Weapon_A.damageBonus = 3; 
+                skill_Unit_2_Weapon_A.explosionType = sc.explosion_Cluster;
+                skill_Unit_2_Weapon_A.splashInnerRadius = 30;
+                skill_Unit_2_Weapon_A.splashMiddleRadius = 30;
+                skill_Unit_2_Weapon_A.splashOuterRadius = 30; 
+            }
+
+            effect_Unit_Sprite.image = sc.image_Scourge;
+            effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
+            break;
+        case 2:
+            skill_Unit_1_Sprite.image = sc.image_Mutal;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
+
+            effect_Unit_Sprite.image = sc.image_Guard;
+            effect_Unit_Sprite.image.drawingFunction = sc.drawing_Black;
+            break;
+        case 3:
+            skill_Unit_1_Sprite.image = sc.image_Mutal;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
+
+            skill_Unit_2.seekRange = 5;
+            skill_Unit_2.buildingDimensions = 0;
+            skill_Unit_2_Sprite.image = sc.image_Mutal;
+            skill_Unit_2_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_2_Weapon_A.damage = 0;
+            skill_Unit_2_Weapon_A.damageBonus = 0;
+            skill_Unit_2_Weapon_A_Sprite.image = sc.image_WCircle;
+            skill_Unit_2_Weapon_A.maxRange = 5*32;
+            skill_Unit_2_Weapon_A.behavior = sc.behavior_Instant;
+            skill_Unit_2_Weapon_A.explosionType = sc.explosion_Mael;
+            skill_Unit_2_Weapon_A.splashInnerRadius = 0;
+            skill_Unit_2_Weapon_A.splashMiddleRadius = 0;
+            skill_Unit_2_Weapon_A.splashOuterRadius = 0;
+            
+            effect_Unit_Sprite.image = sc.image_Egg;
+            effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
+            break;
+        case 4:
+            skill_Unit_1.seekRange = 5;
+            skill_Unit_1_Sprite.image = sc.image_Mutal;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_1_Weapon_G.damage = 21;
+            skill_Unit_1_Weapon_G.damageBonus = 4;
+            skill_Unit_1_Weapon_G_Sprite.image = sc.image_Glave;
+            skill_Unit_1_Weapon_G.maxRange = 5*32;
+            skill_Unit_1_Weapon_G.behavior = sc.behavior_Instant;
+            skill_Unit_1_Weapon_G.explosionType = sc.explosion_Basic;
+            skill_Unit_1_Weapon_G.splashInnerRadius = 0;
+            skill_Unit_1_Weapon_G.splashMiddleRadius = 0;
+            skill_Unit_1_Weapon_G.splashOuterRadius = 0;
+
+            effect_Unit_Sprite.image = sc.image_Queen;
+            effect_Unit_Sprite.image.drawingFunction = sc.drawing_Black;
+            effect_Unit_Sprite.image.iscript = 27;
+            break;
+        case 5:
+            skill_Unit_1.seekRange = 8;
+            skill_Unit_1_Sprite.image = sc.image_Guard;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_1_Weapon_G.damage = 21;
+            skill_Unit_1_Weapon_G.damageBonus = 4;
+            skill_Unit_1_Weapon_G_Sprite.image = sc.image_Acid;
+            skill_Unit_1_Weapon_G.maxRange = 8*32;
+            skill_Unit_1_Weapon_G.behavior = sc.behavior_Instant;
+            skill_Unit_1_Weapon_G.explosionType = sc.explosion_Basic;
+            skill_Unit_1_Weapon_G.splashInnerRadius = 0;
+            skill_Unit_1_Weapon_G.splashMiddleRadius = 0;
+            skill_Unit_1_Weapon_G.splashOuterRadius = 0;
+
+            effect_Unit_Sprite.image = sc.image_Scarab;
+            effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
+            break;
+        case 7:
+            skill_Unit_1.seekRange = 5;
+            skill_Unit_1_Sprite.image = sc.image_Mutal;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_1_Weapon_G.damage = 21;
+            skill_Unit_1_Weapon_G.damageBonus = 4;
+            skill_Unit_1_Weapon_G_Sprite.image = sc.image_Venom;
+            skill_Unit_1_Weapon_G.maxRange = 5*32;
+            skill_Unit_1_Weapon_G.behavior = sc.behavior_Targetunit;
+            skill_Unit_1_Weapon_G.explosionType = sc.explosion_Basic;
+            skill_Unit_1_Weapon_G.splashInnerRadius = 0;
+            skill_Unit_1_Weapon_G.splashMiddleRadius = 0;
+            skill_Unit_1_Weapon_G.splashOuterRadius = 0;
+
+            effect_Unit_Sprite.image = sc.image_Lurker;
+            effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
+            break;
+        case 9:
+            skill_Unit_1.seekRange = 7;
+            skill_Unit_1_Sprite.image = sc.image_Mutal;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_1_Weapon_G.damage = 16;
+            skill_Unit_1_Weapon_G.damageBonus = 3;
+            skill_Unit_1_Weapon_G_Sprite.image = sc.image_Seeker;
+            skill_Unit_1_Weapon_G.maxRange = 7*32;
+            skill_Unit_1_Weapon_G.behavior = sc.behavior_Targetloc;
+            skill_Unit_1_Weapon_G.explosionType = sc.explosion_Cluster;
+            skill_Unit_1_Weapon_G.splashInnerRadius = 20;
+            skill_Unit_1_Weapon_G.splashMiddleRadius = 20;
+            skill_Unit_1_Weapon_G.splashOuterRadius = 20;
+            break;
+        case 10:
+            skill_Unit_1.seekRange = 10;
+            skill_Unit_1_Sprite.image = sc.image_Mutal;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_1_Weapon_G.damage = 27;
+            skill_Unit_1_Weapon_G.damageBonus = 5;
+            skill_Unit_1_Weapon_G_Sprite.image = sc.image_Venom;
+            skill_Unit_1_Weapon_G.maxRange = 10*32;
+            skill_Unit_1_Weapon_G.behavior = sc.behavior_Targetunit;
+            skill_Unit_1_Weapon_G.explosionType = sc.explosion_Basic;
+            skill_Unit_1_Weapon_G.splashInnerRadius = 0;
+            skill_Unit_1_Weapon_G.splashMiddleRadius = 0;
+            skill_Unit_1_Weapon_G.splashOuterRadius = 0;
+
+            effect_Unit_Sprite.image = sc.image_DarkA;
+            effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
+            break;
+        case 11:
+            skill_Unit_1.seekRange = 10;
+            skill_Unit_1_Sprite.image = sc.image_Mutal;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_1_Weapon_G.damage = 27;
+            skill_Unit_1_Weapon_G.damageBonus = 5;
+            skill_Unit_1_Weapon_G_Sprite.image = sc.image_Venom;
+            skill_Unit_1_Weapon_G.maxRange = 10*32;
+            skill_Unit_1_Weapon_G.behavior = sc.behavior_Targetunit;
+            skill_Unit_1_Weapon_G.explosionType = sc.explosion_Basic;
+            skill_Unit_1_Weapon_G.splashInnerRadius = 0;
+            skill_Unit_1_Weapon_G.splashMiddleRadius = 0;
+            skill_Unit_1_Weapon_G.splashOuterRadius = 0;
+
+            skill_Unit_2.buildingDimensions = 65537;
+            skill_Unit_2_Sprite.image = sc.image_DarkA;
+            skill_Unit_2_Sprite.image.drawingFunction = sc.drawing_Origin;
+
+            effect_Unit_Sprite.image = sc.image_Devour;
+            effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
+            break;
+    
+        default:
+            break;
+    }
+}
+
+function Death_Skill(cp, epd, type, timer, max) {
+    if (timer == 0) Death_UnitSetting(cp, type, 0);
+    const Ncp = cp + 8;
+    switch (type) {
+        case 1: //Q
+            if (timer == 0)
+            {
+                const x, y = getlocTL(heroLoc);
+                setloc(searchLoc, x, y);
+                dilateloc(searchLoc, 128, 128);
+                RemoveUnit(0, P12);
+                MoveLocation(targetLoc, "Men", NonAlliedVictoryPlayers, searchLoc);
+                TE.AttackGround(searchLoc, targetLoc, skill_Unit_2, dummyUnit, cp);
+            }
+            else if (timer == 4) {
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 4; j++) {
+                        setloc(tempLoc, x + Death_Q_Cross_dx[i]*j, y + Death_Q_Cross_dy[i]*j);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    }
+                }
+            }
+            else if (timer == 6)
+            {
+                RemoveUnit(effect_Unit, cp);
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 4; j++) {
+                        setloc(tempLoc, x + Death_Q_Cross_dx[i]*j, y + Death_Q_Cross_dy[i]*j);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                        Unit_Color_Change(cp, epd, color_Black);
+                    }
+                }
+            }
+            break;
+        case 2: //Q-Q
+            if (timer == 0 || timer == 8)
+            {
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 3; j++) {
+                        setloc(tempLoc, x + Death_Q_Cross_dx[i]*j, y + Death_Q_Cross_dy[i]*j);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    }
+                }
+            }
+            else if (timer == 2 || timer == 10)
+            {
+                RemoveUnit(effect_Unit, cp);
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 3; j++) {
+                        setloc(tempLoc, x + Death_Q_Cross_dx[i]*j, y + Death_Q_Cross_dy[i]*j);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                        Unit_Color_Change(cp, epd, color_ArmyD);
+                    }
+                }
+            }
+            else if (timer == 4)
+            {
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 3; j++) {
+                        setloc(tempLoc, x + Death_Q_Straight_dx[i]*j, y + Death_Q_Straight_dy[i]*j);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    }
+                }
+            }
+            else if (timer == 6)
+            {
+                RemoveUnit(effect_Unit, cp);
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 3; j++) {
+                        setloc(tempLoc, x + Death_Q_Straight_dx[i]*j, y + Death_Q_Straight_dy[i]*j);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                        Unit_Color_Change(cp, epd, color_ArmyD);
+                    }
+                }
+            }
+            break;
+        case 3: //Q-W
+            if (timer == 2)
+            {
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_64[i*2];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                }
+            }
+            else if (timer == 4)
+            {
+                KillUnit(effect_Unit, cp);
+                TE.AttackGround(targetLoc, targetLoc, skill_Unit_2, dummyUnit, cp);
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 3; j++) {
+                        setloc(tempLoc, x + Death_Q_Straight_dx[i]*j, y + Death_Q_Straight_dy[i]*j);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                        Unit_Color_Change(cp, epd, color_ArmyD);
+                    }
+                }
+            }
+            break;
+        case 4: //Q-E
+            if (timer == 0 || timer == 10)
+            {
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_32[i*2];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                }
+            }
+            if (timer == 2 || timer == 12)
+            {
+                RemoveUnit(effect_Unit, cp);
+            }
+            if (timer == 3 || timer == 13)
+            {
+                const x, y = getlocTL(targetLoc);
+                const offset = (timer == 3) ? 0 : 1;
+                TE.SetPColor(Ncp, color_ArmyF);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_32[i*2 + offset];
+                    setloc(tempLoc, x + dx, y + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_64[i*2];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                }
+            }
+            if (timer == 5 || timer == 15)
+            {
+                RemoveUnit(effect_Unit, cp);
+            }
+            if (timer == 6 || timer == 16)
+            {
+                const x, y = getlocTL(targetLoc);
+                const offset = (timer == 6) ? 1 : 0;
+                TE.SetPColor(Ncp, color_ArmyD);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_64[i*2+offset];
+                    setloc(tempLoc, x + dx, y + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_96[i*2];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                }
+            }
+            if (timer == 81 || timer == 18)
+            {
+                RemoveUnit(effect_Unit, cp);
+            }
+            if (timer == 9 || timer == 19)
+            {
+                const x, y = getlocTL(targetLoc);
+                const offset = (timer == 9) ? 0 : 1;
+                TE.SetPColor(Ncp, color_Black);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_96[i*2+offset];
+                    setloc(tempLoc, x + dx, y + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+            }
+            break;
+        case 5: //W
+            if (timer == 3)
+            {
+                const x, y = getlocTL(heroLoc);
+                TE.SetPColor(Ncp, color_White);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_128[i*2];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                KillUnit(effect_Unit, cp);
+            }
+            if (timer == 6)
+            {
+                const x, y = getlocTL(heroLoc);
+                TE.SetPColor(Ncp, color_Wine);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_96[i*2];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                KillUnit(effect_Unit, cp);
+            }
+            if (timer == 9)
+            {
+                const x, y = getlocTL(heroLoc);
+                TE.SetPColor(Ncp, color_Yellow);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_64[i*2];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                KillUnit(effect_Unit, cp);
+            }
+            if (timer == 12)
+            {
+                const x, y = getlocTL(heroLoc);
+                TE.SetPColor(Ncp, color_PeachD);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_32[i*2];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                KillUnit(effect_Unit, cp);
+            }
+            break;
+        case 6: //W-Q
+            if (timer%48 == 0 && timer < 15*24)
+            {
+                const image_OriginId = effect_Unit_Sprite.image;
+                const drawing_OriginId = effect_Unit_Sprite.image.drawingFunction;
+                effect_Unit_Sprite.image = sc.image_Over;
+                effect_Unit_Sprite.image.drawingFunction = sc.drawing_Green;
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, heroLoc);
+                effect_Unit_Sprite.image = image_OriginId;
+                effect_Unit_Sprite.image.drawingFunction = drawing_OriginId;
+                KillUnit(effect_Unit, cp);
+            }
+            if (timer%24 == 0 && timer > 15*24 && timer < 18*24)
+            {
+                const image_OriginId = effect_Unit_Sprite.image;
+                const drawing_OriginId = effect_Unit_Sprite.image.drawingFunction;
+                effect_Unit_Sprite.image = sc.image_Over;
+                effect_Unit_Sprite.image.drawingFunction = sc.drawing_Green;
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, heroLoc);
+                effect_Unit_Sprite.image = image_OriginId;
+                effect_Unit_Sprite.image.drawingFunction = drawing_OriginId;
+                KillUnit(effect_Unit, cp);
+            }
+            if (timer%8 == 0 && timer > 18*24 && timer < 20*24)
+            {
+                const image_OriginId = effect_Unit_Sprite.image;
+                const drawing_OriginId = effect_Unit_Sprite.image.drawingFunction;
+                effect_Unit_Sprite.image = sc.image_Over;
+                effect_Unit_Sprite.image.drawingFunction = sc.drawing_Green;
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, heroLoc);
+                effect_Unit_Sprite.image = image_OriginId;
+                effect_Unit_Sprite.image.drawingFunction = drawing_OriginId;
+                KillUnit(effect_Unit, cp);
+            }
+            const amount = 50*256/24;
+            sy.Unit_Healing_Count(epd, cp, amount);
+            break;
+        case 7: //W-W
+            if (timer%2 == 0 && timer < 64)
+            {
+                const x, y = getlocTL(heroLoc);
+                const tick = (timer/2)%16;
+                const dx, dy = Death_Circle_32[tick];
+                setloc(tempLoc, x + dx, y + dy);
+                const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, sy.NONE);
+                Death_SkillGroup.add(epd);
+                bwrite_epd(epd + 0x84/4, 2, 1); //행동타입
+                bwrite_epd(epd + 0x8C/4, 0, 4); //행동 타이머
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                KillUnit(effect_Unit, cp);
+                TE.SetUnitColorEPD(epd, Ncp);
+            }
+            if (timer%2 == 0 && timer < 64)
+            {
+                const x, y = getlocTL(heroLoc);
+                const tick = (timer/2)%16;
+                const dx, dy = Death_Circle_64[tick];
+                setloc(tempLoc, x + dx, y + dy);
+                const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, sy.NONE);
+                Death_SkillGroup.add(epd);
+                bwrite_epd(epd + 0x84/4, 2, 1); //행동타입
+                bwrite_epd(epd + 0x8C/4, 0, 4); //행동 타이머
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                KillUnit(effect_Unit, cp);
+                TE.SetUnitColorEPD(epd, Ncp);
+            }
+            if (timer%2 == 0 && timer < 64)
+            {
+                const x, y = getlocTL(heroLoc);
+                const tick = (timer/2)%16;
+                const dx, dy = Death_Circle_96[tick];
+                setloc(tempLoc, x + dx, y + dy);
+                const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, sy.NONE);
+                Death_SkillGroup.add(epd);
+                bwrite_epd(epd + 0x84/4, 2, 1); //행동타입
+                bwrite_epd(epd + 0x8C/4, 0, 4); //행동 타이머
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                KillUnit(effect_Unit, cp);
+                TE.SetUnitColorEPD(epd, Ncp);
+            }
+            if (timer%2 == 0) 
+            {
+                TE.SetPColor(Ncp, array_ColorLine_Dark[timer/2%8]);
+            }
+        case 8: //W-E
+            break;
+        case 9: //E
+            if (timer%5 == 0 && timer < 12)
+            {
+                const x, y = posread_epd(epd + 0x28/4);
+                setloc(searchLoc, x, y);
+                dilateloc(searchLoc, 160, 160);
+                RemoveUnit(0, P12);
+                MoveLocation(targetLoc, "Men", NonAlliedVictoryPlayers, searchLoc);
+                const tx, ty = getlocTL(targetLoc);
+                sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc, 4);
+                TE.SetPColor(Ncp, array_ColorLine_Dark[timer/5]);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Square_3[i];
+                    setloc(tempLoc, tx + dx, ty + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                for (var i = 0; i < 16; i++) {
+                    const dx, dy = Death_Square_5[i];
+                    setloc(tempLoc, tx + dx, ty + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+            }
+            break;
+        case 10: //E-E
+            if (timer < 30) 
+            {
+                if (timer%2 == 0)
+                {
+                    const x, y = getlocTL(targetLoc);
+                    const temp = (timer/2)%4;
+                    TE.SetPColor(Ncp, array_ColorLine_Dark[(timer/5)%8]);
+                    for (var i = 1; i < 4; i++) {
+                        setloc(tempLoc, x + Death_Q_Straight_dx[temp]*i, y + Death_Q_Straight_dy[temp]*i);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                        TE.SetUnitColorEPD(epd, Ncp);
+                    }
+                    KillUnit(effect_Unit, cp);
+                }
+                if (timer%2 == 1)
+                {
+                    const x, y = getlocTL(targetLoc);
+                    const temp = (timer-1)/2%4;
+                    for (var i = 1; i < 4; i++) {
+                        setloc(tempLoc, x + Death_Q_Cross_dx[temp]*i, y + Death_Q_Cross_dy[temp]*i);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                        TE.SetUnitColorEPD(epd, Ncp);
+                    }
+                    KillUnit(effect_Unit, cp);
+                }
+            }
+            break;
+        case 11: //R
+            if (timer == 0)
+            {
+                const x, y = getlocTL(heroLoc);
+                setloc(targetLoc, x, y);
+                for (var i = 0; i < 4; i++) {
+                    acc_Square[i] = 0;
+                }
+            }
+            if (timer < 120)
+            {
+                const x, y = getlocTL(targetLoc);
+                // --- [0] 16개 점 그룹 (Size 4) ---
+                acc_Square[0] += 16;
+                if (acc_Square[0] >= 80) {
+                    acc_Square[0] -= 80;
+                    pos_Square[0] = (pos_Square[0] + 1) % 16; // 한 칸 전진
+                    
+                    for (var i = 0; i < 4; i++) {
+                        const index = (pos_Square[0] + i * 4) % 16; // 4칸 간격으로 4개 생성
+                        const dx, dy = Death_Square_5[index];
+                        setloc(tempLoc, x + dx, y + dy);
+                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
+                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
+                    }
+                    KillUnit(skill_Unit_2, cp);
+                }
+
+                // --- [1] 24개 점 그룹 (Size 6) ---
+                acc_Square[1] += 24;
+                if (acc_Square[1] >= 80) {
+                    acc_Square[1] -= 80;
+                    pos_Square[1] = (pos_Square[1] + 1) % 24; // 한 칸 전진
+
+                    for (var i = 0; i < 4; i++) {
+                        const index = (pos_Square[1] + i * 6) % 24; // 6칸 간격으로 4개 생성
+                        const dx, dy = Death_Square_7[index];
+                        setloc(tempLoc, x + dx, y + dy);
+                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
+                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
+                    }
+                    KillUnit(skill_Unit_2, cp);
+                }
+
+                // --- [2] 32개 점 그룹 (Size 8) ---
+                acc_Square[2] += 32;
+                if (acc_Square[2] >= 80) {
+                    acc_Square[2] -= 80;
+                    pos_Square[2] = (pos_Square[2] + 1) % 32; // 한 칸 전진
+
+                    for (var i = 0; i < 4; i++) {
+                        const index = (pos_Square[2] + i * 8) % 32; // 8칸 간격으로 4개 생성
+                        const dx, dy = Death_Square_9[index];
+                        setloc(tempLoc, x + dx, y + dy);
+                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
+                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
+                    }
+                    KillUnit(skill_Unit_2, cp);
+                }
+                if (timer%16 == 0)
+                {
+                    const x, y = getlocTL(targetLoc);
+                    for (var i = 0; i < 8; i++) {
+                        const dx, dy = Death_Square_3[i];
+                        setloc(tempLoc, x + dx, y + dy);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    }
+                    KillUnit(effect_Unit, cp);
+                }
+            }
+            break;
+    
+        default:
+            break;
+    }
+    if (timer == max) 
+    {
+        Death_UnitSetting_Reset();
+        return true;
+    }
+    return false;
+}
+function Death_Skill_Enhance(cp, epd, type, timer, max) {
+    if (timer == 0) Death_UnitSetting(cp, type, 1);
+    const Ncp = cp + 8;
+    switch (type) {
+        case 1: //Q
+            if (timer == 0)
+            {
+                const x, y = getlocTL(heroLoc);
+                setloc(searchLoc, x, y);
+                dilateloc(searchLoc, 196, 196);
+                RemoveUnit(0, P12);
+                MoveLocation(targetLoc, "Men", NonAlliedVictoryPlayers, searchLoc);
+                TE.AttackGround(searchLoc, targetLoc, skill_Unit_2, dummyUnit, cp);
+            }
+            else if (timer == 4) {
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 4; j++) {
+                        setloc(tempLoc, x + Death_Q_Cross_dx[i]*j, y + Death_Q_Cross_dy[i]*j);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    }
+                }
+            }
+            else if (timer == 6)
+            {
+                RemoveUnit(effect_Unit, cp);
+                const x, y = getlocTL(targetLoc);
+                TE.SetPColor(Ncp, color_Black);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 4; j++) {
+                        setloc(tempLoc, x + Death_Q_Cross_dx[i]*j, y + Death_Q_Cross_dy[i]*j);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                        TE.SetUnitColorEPD(epd, Ncp);
+                    }
+                    setloc(tempLoc, x + Death_Q_Straight_dx[i], y + Death_Q_Straight_dy[i]);
+                    const epd_2 = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd_2, Ncp);
+                }
+            }
+            break;
+        case 2: //Q-Q
+            if (timer == 0 || timer == 8)
+            {
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 4; j++) {
+                        setloc(tempLoc, x + Death_Q_Cross_dx[i]*j, y + Death_Q_Cross_dy[i]*j);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    }
+                }
+            }
+            else if (timer == 2 || timer == 10)
+            {
+                RemoveUnit(effect_Unit, cp);
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 4; j++) {
+                        setloc(tempLoc, x + Death_Q_Cross_dx[i]*j, y + Death_Q_Cross_dy[i]*j);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                        Unit_Color_Change(cp, epd, color_ArmyD);
+                    }
+                }
+            }
+            else if (timer == 4)
+            {
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 4; j++) {
+                        setloc(tempLoc, x + Death_Q_Straight_dx[i]*j, y + Death_Q_Straight_dy[i]*j);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    }
+                }
+            }
+            else if (timer == 6)
+            {
+                RemoveUnit(effect_Unit, cp);
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 4; j++) {
+                        setloc(tempLoc, x + Death_Q_Straight_dx[i]*j, y + Death_Q_Straight_dy[i]*j);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                        Unit_Color_Change(cp, epd, color_ArmyD);
+                    }
+                }
+            }
+            break;
+        case 3: //Q-W
+            if (timer == 2)
+            {
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_64[i*2];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                }
+            }
+            else if (timer == 4)
+            {
+                KillUnit(effect_Unit, cp);
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 3; j++) {
+                        setloc(tempLoc, x + Death_Q_Straight_dx[i]*j, y + Death_Q_Straight_dy[i]*j);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                        Unit_Color_Change(cp, epd, color_ArmyD);
+                    }
+                }
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 1; j < 2; j++) {
+                        setloc(tempLoc, x + Death_Q_Straight_dx[i]*j, y + Death_Q_Straight_dy[i]*j);
+                        TE.AttackGround(tempLoc, tempLoc, skill_Unit_2, dummyUnit, cp);
+                    }
+                }
+            }
+            break;
+        case 4: //Q-E
+            if (timer == 0 || timer == 10 || timer == 20)
+            {
+                const x, y = getlocTL(targetLoc);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_32[i*2];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                }
+            }
+            if (timer == 2 || timer == 12 || timer == 22)
+            {
+                RemoveUnit(effect_Unit, cp);
+            }
+            if (timer == 3 || timer == 13 || timer == 23)
+            {
+                const x, y = getlocTL(targetLoc);
+                const offset = (timer == 3 || timer == 23) ? 0 : 1;
+                TE.SetPColor(Ncp, color_ArmyF);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_32[i*2 + offset];
+                    setloc(tempLoc, x + dx, y + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_64[i*2];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                }
+            }
+            if (timer == 5 || timer == 15 || timer == 25)
+            {
+                RemoveUnit(effect_Unit, cp);
+            }
+            if (timer == 6 || timer == 16 || timer == 26)
+            {
+                const x, y = getlocTL(targetLoc);
+                const offset = (timer == 6 || timer == 26) ? 1 : 0;
+                TE.SetPColor(Ncp, color_ArmyD);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_64[i*2+offset];
+                    setloc(tempLoc, x + dx, y + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_96[i*2];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                }
+            }
+            if (timer == 8 || timer == 18 || timer == 28)
+            {
+                RemoveUnit(effect_Unit, cp);
+            }
+            if (timer == 9 || timer == 19 || timer == 29)
+            {
+                const x, y = getlocTL(targetLoc);
+                const offset = (timer == 9 || timer == 29) ? 0 : 1;
+                TE.SetPColor(Ncp, color_Black);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Circle_96[i*2+offset];
+                    setloc(tempLoc, x + dx, y + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+            }
+            break;
+        case 5: //W
+            if (timer == 3)
+            {
+                const x, y = getlocTL(heroLoc);
+                TE.SetPColor(Ncp, color_White);
+                for (var i = 0; i < 16; i++) {
+                    const dx, dy = Death_Circle_128[i];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                KillUnit(effect_Unit, cp);
+            }
+            if (timer == 6)
+            {
+                const x, y = getlocTL(heroLoc);
+                TE.SetPColor(Ncp, color_Wine);
+                for (var i = 0; i < 16; i++) {
+                    const dx, dy = Death_Circle_96[i];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                KillUnit(effect_Unit, cp);
+            }
+            if (timer == 9)
+            {
+                const x, y = getlocTL(heroLoc);
+                TE.SetPColor(Ncp, color_Yellow);
+                for (var i = 0; i < 16; i++) {
+                    const dx, dy = Death_Circle_64[i];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                KillUnit(effect_Unit, cp);
+            }
+            if (timer == 12)
+            {
+                const x, y = getlocTL(heroLoc);
+                TE.SetPColor(Ncp, color_PeachD);
+                for (var i = 0; i < 16; i++) {
+                    const dx, dy = Death_Circle_32[i];
+                    setloc(tempLoc, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                KillUnit(effect_Unit, cp);
+            }
+            break;
+        case 6: //W-Q
+            if (timer%48 == 0 && timer < 20*24)
+            {
+                const image_OriginId = effect_Unit_Sprite.image;
+                const drawing_OriginId = effect_Unit_Sprite.image.drawingFunction;
+                effect_Unit_Sprite.image = sc.image_Over;
+                effect_Unit_Sprite.image.drawingFunction = sc.drawing_Green;
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, heroLoc);
+                effect_Unit_Sprite.image = image_OriginId;
+                effect_Unit_Sprite.image.drawingFunction = drawing_OriginId;
+                KillUnit(effect_Unit, cp);
+            }
+            if (timer%24 == 0 && timer > 20*24 && timer < 25*24)
+            {
+                const image_OriginId = effect_Unit_Sprite.image;
+                const drawing_OriginId = effect_Unit_Sprite.image.drawingFunction;
+                effect_Unit_Sprite.image = sc.image_Over;
+                effect_Unit_Sprite.image.drawingFunction = sc.drawing_Green;
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, heroLoc);
+                effect_Unit_Sprite.image = image_OriginId;
+                effect_Unit_Sprite.image.drawingFunction = drawing_OriginId;
+                KillUnit(effect_Unit, cp);
+            }
+            if (timer%8 == 0 && timer > 25*24 && timer < 30*24)
+            {
+                const image_OriginId = effect_Unit_Sprite.image;
+                const drawing_OriginId = effect_Unit_Sprite.image.drawingFunction;
+                effect_Unit_Sprite.image = sc.image_Over;
+                effect_Unit_Sprite.image.drawingFunction = sc.drawing_Green;
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, heroLoc);
+                effect_Unit_Sprite.image = image_OriginId;
+                effect_Unit_Sprite.image.drawingFunction = drawing_OriginId;
+                KillUnit(effect_Unit, cp);
+            }
+            const amount = 50*256/24;
+            sy.Unit_Healing_Count(epd, cp, amount);
+            //하수인 회복 부분은 나중에
+            break;
+        case 7: //W-W
+            if (timer%2 == 0 && timer < 96)
+            {
+                const x, y = getlocTL(heroLoc);
+                const tick = (timer/2)%16;
+                const dx, dy = Death_Circle_32[tick];
+                setloc(tempLoc, x + dx, y + dy);
+                const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, sy.NONE);
+                Death_SkillGroup.add(epd);
+                bwrite_epd(epd + 0x84/4, 2, 1); //행동타입
+                bwrite_epd(epd + 0x8C/4, 0, 4); //행동 타이머
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                KillUnit(effect_Unit, cp);
+                TE.SetUnitColorEPD(epd, Ncp);
+            }
+            if (timer%2 == 0 && timer < 96)
+            {
+                const x, y = getlocTL(heroLoc);
+                const tick = (timer/2)%16;
+                const dx, dy = Death_Circle_64[tick];
+                setloc(tempLoc, x + dx, y + dy);
+                const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, sy.NONE);
+                Death_SkillGroup.add(epd);
+                bwrite_epd(epd + 0x84/4, 2, 1); //행동타입
+                bwrite_epd(epd + 0x8C/4, 0, 4); //행동 타이머
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                KillUnit(effect_Unit, cp);
+                TE.SetUnitColorEPD(epd, Ncp);
+            }
+            if (timer%2 == 0 && timer < 96)
+            {
+                const x, y = getlocTL(heroLoc);
+                const tick = (timer/2)%16;
+                const dx, dy = Death_Circle_96[tick];
+                setloc(tempLoc, x + dx, y + dy);
+                const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, sy.NONE);
+                Death_SkillGroup.add(epd);
+                bwrite_epd(epd + 0x84/4, 2, 1); //행동타입
+                bwrite_epd(epd + 0x8C/4, 0, 4); //행동 타이머
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                KillUnit(effect_Unit, cp);
+                TE.SetUnitColorEPD(epd, Ncp);
+            }
+            if (timer%2 == 0) 
+            {
+                TE.SetPColor(Ncp, array_ColorLine_Dark[timer/2%8]);
+            }
+        case 8: //W-E
+            break;
+        case 9: //E
+            if (timer%5 == 0 && timer < 12)
+            {
+                const x, y = posread_epd(epd + 0x28/4);
+                setloc(searchLoc, x, y);
+                dilateloc(searchLoc, 160, 160);
+                RemoveUnit(0, P12);
+                MoveLocation(targetLoc, "Men", NonAlliedVictoryPlayers, searchLoc);
+                const tx, ty = getlocTL(targetLoc);
+                sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc, 4);
+                TE.SetPColor(Ncp, array_ColorLine_Dark[timer/5]);
+                for (var i = 0; i < 8; i++) {
+                    const dx, dy = Death_Square_3[i];
+                    setloc(tempLoc, tx + dx, ty + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                for (var i = 0; i < 16; i++) {
+                    const dx, dy = Death_Square_5[i];
+                    setloc(tempLoc, tx + dx, ty + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+                for (var i = 0; i < 24; i++) {
+                    const dx, dy = Death_Square_7[i];
+                    setloc(tempLoc, tx + dx, ty + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                    TE.SetUnitColorEPD(epd, Ncp);
+                }
+            }
+            break;
+        case 10: //E-E
+            if (timer < 45) 
+            {
+                if (timer%2 == 0)
+                {
+                    const x, y = getlocTL(targetLoc);
+                    const temp = (timer/2)%4;
+                    TE.SetPColor(Ncp, array_ColorLine_Dark[(timer/5)%8]);
+                    for (var i = 1; i < 5; i++) {
+                        setloc(tempLoc, x + Death_Q_Straight_dx[temp]*i, y + Death_Q_Straight_dy[temp]*i);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                        TE.SetUnitColorEPD(epd, Ncp);
+                    }
+                    KillUnit(effect_Unit, cp);
+                }
+                if (timer%2 == 1)
+                {
+                    const x, y = getlocTL(targetLoc);
+                    const temp = (timer-1)/2%4;
+                    for (var i = 1; i < 5; i++) {
+                        setloc(tempLoc, x + Death_Q_Cross_dx[temp]*i, y + Death_Q_Cross_dy[temp]*i);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                        TE.SetUnitColorEPD(epd, Ncp);
+                    }
+                    KillUnit(effect_Unit, cp);
+                }
+            }
+            break;
+        case 11: //R
+            if (timer == 0)
+            {
+                const x, y = getlocTL(heroLoc);
+                setloc(targetLoc, x, y);
+            }
+            if (timer < 160)
+            {
+                const x, y = getlocTL(targetLoc);
+
+                // --- [0] 16개 점 그룹 (Size 4) ---
+                acc_Square[0] += 16;
+                if (acc_Square[0] >= 80) {
+                    acc_Square[0] -= 80;
+                    pos_Square[0] = (pos_Square[0] + 1) % 16; // 한 칸 전진
+                    
+                    for (var i = 0; i < 4; i++) {
+                        const index = (pos_Square[0] + i * 4) % 16; // 4칸 간격으로 4개 생성
+                        const dx, dy = Death_Square_5[index];
+                        setloc(tempLoc, x + dx, y + dy);
+                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
+                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
+                    }
+                    KillUnit(skill_Unit_2, cp);
+                }
+
+                // --- [1] 24개 점 그룹 (Size 6) ---
+                acc_Square[1] += 24;
+                if (acc_Square[1] >= 80) {
+                    acc_Square[1] -= 80;
+                    pos_Square[1] = (pos_Square[1] + 1) % 24; // 한 칸 전진
+
+                    for (var i = 0; i < 4; i++) {
+                        const index = (pos_Square[1] + i * 6) % 24; // 6칸 간격으로 4개 생성
+                        const dx, dy = Death_Square_7[index];
+                        setloc(tempLoc, x + dx, y + dy);
+                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
+                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
+                    }
+                    KillUnit(skill_Unit_2, cp);
+                }
+
+                // --- [2] 32개 점 그룹 (Size 8) ---
+                acc_Square[2] += 32;
+                if (acc_Square[2] >= 80) {
+                    acc_Square[2] -= 80;
+                    pos_Square[2] = (pos_Square[2] + 1) % 32; // 한 칸 전진
+
+                    for (var i = 0; i < 4; i++) {
+                        const index = (pos_Square[2] + i * 8) % 32; // 8칸 간격으로 4개 생성
+                        const dx, dy = Death_Square_9[index];
+                        setloc(tempLoc, x + dx, y + dy);
+                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
+                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
+                    }
+                    KillUnit(skill_Unit_2, cp);
+                }
+
+                // --- [3] 40개 점 그룹 (Size 10) ---
+                acc_Square[3] += 40;
+                if (acc_Square[3] >= 80) {
+                    acc_Square[3] -= 80;
+                    pos_Square[3] = (pos_Square[3] + 1) % 40; // 한 칸 전진
+
+                    for (var i = 0; i < 4; i++) {
+                        const index = (pos_Square[3] + i * 10) % 40; // 8칸 간격으로 4개 생성
+                        const dx, dy = Death_Square_11[index];
+                        setloc(tempLoc, x + dx, y + dy);
+                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
+                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
+                    }
+                    KillUnit(skill_Unit_2, cp);
+                }
+                if (timer%16 == 0)
+                {
+                    const x, y = getlocTL(targetLoc);
+                    for (var i = 0; i < 8; i++) {
+                        const dx, dy = Death_Square_3[i];
+                        setloc(tempLoc, x + dx, y + dy);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    }
+                    KillUnit(effect_Unit, cp);
+                }
+            }
+            break;
+    
+        default:
+            break;
+    }
+    if (timer == max) 
+    {
+        Death_UnitSetting_Reset();
+        return true;
+    }
+    return false;
+}
+function Death_Skill_Main(cp, sado_Main: EUDArray) {
+    const sado = sdo.Sado.cast(sado_Main[cp]);
+    for (var i = 1; i < 30; i++) {
+        const info = sdo.Skill_Info.cast(sado.info[i]);
+        var cond = 0;
+        if (info.isActived)
+        {
+            if (info.isEnhance) cond = Death_Skill_Enhance(cp, sado.epd, info.type, info.timer, info.maxtime);
+            else cond = Death_Skill(cp, sado.epd, info.type, info.timer, info.maxtime);
+            info.timer += 1;
+        }
+        if (cond) sado.ComboSetting(i);
+    }
+}
+function Death_UnitGroup(cp, minion_order) {
+    foreach (unit : Death_SkillGroup.cploop) {
+        foreach (dead : unit.dying) {
+            
+        }
+        const cunit = CUnit(unit.epd);
+        const type = cunit.unknown0x86;
+        const timer = cunit.unknown0x8C;
+        if (type == 1) 
+        {
+            //W-W 공격후 모이기
+            if (timer == 0)
+            {
+                cunit.unknown0x86 = 2;
+                cunit.unknown0x8C = 12;
+                unit.move_cp(0x28/4);
+                const x, y = cunit.posX, cunit.posY;
+                setloc(tempLoc, x, y);
+                Order(8, cp, tempLoc, Move, heroLoc);
+            } else {
+                cunit.unknown0x8C -= 1;
+            }
+        }
+        else if (type == 2)
+        {
+            //W-W모인 이후 사망
+            if (timer == 0)
+            {
+                cunit.orderID = 0;
+            } else {
+                cunit.unknown0x8C -= 1;
+            }
+        }
+    }
+    //minion_order : 1: 집결, 2: 거점, 4: 생성(800min)
+    if (minion_order & 4)
+    {
+        if (Accumulate(cp, AtLeast, minion_Cost, Ore)) //미네랄확인
+        {
+            //텍스트 출력
+            const x, y = getlocTL(heroLoc);
+            effect_Unit_Sprite.image = sc.image_Queen;
+            //하수인 생성
+            const epd = sy.Unit_Create(cp, death_Minion_Unit, bufferLoc, heroLoc);
+            //이펙트 유닛 생성
+            sy.Unit_Create(cp, effect_Unit, bufferLoc, heroLoc);
+            KillUnit(effect_Unit, cp);
+            sc.Reset_Change(effect_Unit_Sprite);
+            if (epd > 0)
+            {
+                //자원 감소
+                SetResources(cp, Subtract, minion_Cost, Ore);
+                printAllAt(6, "\x04하수인 소환 성공 \x02(\x08-\x07{}\x03Gold\x02)", minion_Cost);
+                Death_MinionGroup_Main.add(epd);
+            } else {
+                //유닛제한으로 생성 실패
+                printAllAt(6, "\x04하수인 소환 실패 \x02(\x04유닛 제한 오류!\x02)");
+            }
+        } else {
+            //자원부족으로 하수인 생성 실패
+            printAllAt(6, "\x04하수인 소환 실패 \x02(\x04자원 부족!\x02)");
+        }
+    }
+    foreach (unit : Death_MinionGroup_Main.cploop) {
+        foreach (dead : unit.dying) {
+            
+        }
+        const cunit = CUnit(unit.epd);
+        const type = cunit.unknown0x86;
+        const timer = cunit.unknown0x8C;
+        if (type == 1) 
+        {
+            //W-W 공격후 모이기
+            if (timer == 0)
+            {
+                cunit.unknown0x86 = 2;
+                cunit.unknown0x8C = 12;
+                unit.move_cp(0x28/4);
+                const x, y = cunit.posX, cunit.posY;
+                setloc(tempLoc, x, y);
+                Order(8, cp, tempLoc, Move, heroLoc);
+            } else {
+                cunit.unknown0x8C -= 1;
+            }
+        }
+        else if (type == 2)
+        {
+            //W-W모인 이후 사망
+            if (timer == 0)
+            {
+                cunit.orderID = 0;
+            } else {
+                cunit.unknown0x8C -= 1;
+            }
+        }
+    }
+}

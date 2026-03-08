@@ -1,0 +1,90 @@
+import PluginVariables as msqcvar;
+
+
+const image_OriginId =  EUDArray(516);
+const script_OriginId = EUDArray(998);
+const color_OriginId = EUDArray(998);
+
+const image_Glave = 511;
+const image_Seeker = 515;
+const image_Venom = 507;
+const image_Acid = 509;
+const image_Mael = 998;
+const image_WCircle = 503;
+const image_Mutal = 38;
+const image_Over = 42;
+const image_Queen = 46;
+const image_Guard = 25;
+const image_Scourge = 0;
+const image_DarkT = 129;
+const image_DarkA = 925;
+const image_Scarab = 147;
+const image_Scantid = 952;
+const image_Bengal = 342;
+const image_Devour = 915;
+const image_Lurker = 921;
+const image_Kakaru = 954;
+const image_Egg = 21;
+
+const drawing_Black = 10;
+const drawing_Blue = 16;
+const drawing_Green = 13;
+const drawing_Origin = 0;
+
+const iscript_Dot = 272;
+const iscript_Short = 34;
+const iscript_Venom = 257;
+const iscript_Laser = 243;
+
+const behavior_Targetloc = 0;
+const behavior_Targetunit = 1;
+const behavior_Instant = 2;
+const behavior_Storm = 3;
+const behavior_Near = 4;
+const behavior_Melee = 5;
+const behavior_Suicide = 6;
+const behavior_Triple = 7;
+const behavior_Bullet = 8;
+const behavior_Lurker = 9;
+
+const explosion_Basic = 1;
+const explosion_Bomb = 2;
+const explosion_Cluster = 3;
+const explosion_Lockdown = 4;
+const explosion_Nuke = 5;
+const explosion_Parasite = 6;
+const explosion_Broodling = 7;
+const explosion_EMP = 8;
+const explosion_Irradiate = 9;
+const explosion_Ensnare = 10;
+const explosion_Plague = 11;
+const explosion_Stasis = 12;
+const explosion_Swarm = 13;
+const explosion_Consume = 14;
+const explosion_Yamato = 15;
+const explosion_Restoration = 16;
+const explosion_Web = 17;
+const explosion_Acid = 18;
+const explosion_Mind = 19;
+const explosion_Feedback = 20;
+const explosion_Flare = 21;
+const explosion_Mael = 22;
+
+function init() {
+    for (var i = 0; i < 516; i++) {
+        const sprite = Sprite(i);
+        image_OriginId[i] = sprite.image;
+    }
+    for (var i = 0; i < 998; i++) {
+        const image = Image(i);
+        script_OriginId[i] = image.iscript;
+        color_OriginId[i] = image.drawingFunction;
+    }
+}
+
+function Reset_Change(sprite: Sprite) {
+    const image = sprite.image;
+    image.iscript = script_OriginId[image];
+    image.drawingFunction = color_OriginId[image];
+    sprite.image = image_OriginId[sprite];
+}

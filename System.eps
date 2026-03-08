@@ -1,0 +1,227 @@
+import PluginVariables as msqcvar;
+
+
+import TriggerEditor.TETools as TE;
+const tempLoc = $L("Temp");
+const targetLoc = $L("Target");
+const bufferLoc = $L("Buffer");
+const searchLoc = $L("Skill_Range");
+const heroLoc = $L("Hero");
+const centerLoc = $L("Anywhere");
+
+const NONE = 99999;
+function SetNextUnitEPD();
+function Sprite_AllChange_Create(cp, unitId, flingyId, scriptId, colorId, loc)
+{
+    //이미지스크립트 272:점찍기 34:짧은이펙트
+    //색상 0:기본색 10:검정색 13:초록색 16:파란색
+    const flingy_OriginId = bread_epd(EPD(0x6644F8) + unitId/4, unitId%4);
+    const sprite_OriginId = wread_epd(EPD(0x6CA318) + flingyId/2, (flingyId%2)*2);
+    const image_OriginId = wread_epd(EPD(0x666160) + sprite_OriginId/2, (sprite_OriginId%2)*2);
+    const script_OriginId = dwread_epd(EPD(0x66EC48) + image_OriginId);
+    const color_OriginId = bread_epd(EPD(0x669E28) + image_OriginId/4, image_OriginId%4);
+    //수정 부분
+    if (flingyId != NONE) bwrite_epd(EPD(0x6644F8) + unitId/4, unitId%4, flingyId);
+    if (scriptId != NONE) dwwrite_epd(EPD(0x66EC48) + image_OriginId, scriptId);
+    if (colorId != NONE) bwrite_epd(EPD(0x669E28) + image_OriginId/4, image_OriginId%4, colorId);
+    //생성 및 배치
+    const epd = SetNextUnitEPD();
+    CreateUnit(1, unitId, bufferLoc, cp);
+    MoveUnit(1, unitId, cp, bufferLoc, loc);
+    //초기화
+    if (flingyId != NONE) bwrite_epd(EPD(0x6644F8) + unitId/4, unitId%4, flingy_OriginId);
+    if (scriptId != NONE) dwwrite_epd(EPD(0x66EC48) + image_OriginId, script_OriginId);
+    if (colorId != NONE) bwrite_epd(EPD(0x669E28) + image_OriginId/4, image_OriginId%4, color_OriginId);
+    
+    return epd;
+}
+var unit_FlingyId;
+function Sprite_FlingyChange_Set(cp, unitId, flingyId)
+{
+    unit_FlingyId = bread_epd(EPD(0x6644F8) + unitId/4, unitId%4);
+    bwrite_epd(EPD(0x6644F8) + unitId/4, unitId%4, flingyId);
+}
+function Sprite_FlingyChange_Reset(cp, unitId, flingyId)
+{
+    bwrite_epd(EPD(0x6644F8) + unitId/4, unitId%4, unit_FlingyId);
+}
+function SkillChange_Weapon(cp, unitId, weaponDamage, weaponratio, DamageType, explosionType, projectileType, projectileImage, projectileAmount, splashRange, weaponRange)
+{
+    const weaponId = bread_epd(EPD(0x6636B8) + unitId/4, unitId%4);
+    const offset_4 = weaponId/4;
+    const byte_4 = weaponId%4;
+    const offset_2 = weaponId/2;
+    const byte_2 = (weaponId%2)*2;
+    wwrite_epd(EPD(0x656EB0) + offset_2, byte_2, weaponDamage);
+    wwrite_epd(EPD(0x657678) + offset_2, byte_2, weaponratio);
+
+    if (DamageType != NONE) bwrite_epd(EPD(0x657258) + offset_4, byte_4, DamageType);
+    if (explosionType == NONE) bwrite_epd(EPD(0x6566F8) + offset_4, byte_4, 1);
+    else bwrite_epd(EPD(0x6566F8) + offset_4, byte_4, explosionType);
+    
+    bwrite_epd(EPD(0x656670) + offset_4, byte_4, projectileType);
+    dwwrite_epd(EPD(0x656CA8) + weaponId, projectileImage);
+    bwrite_epd(EPD(0x6564E0) + offset_4, byte_4, projectileAmount);
+
+    wwrite_epd(EPD(0x656888) + offset_2, byte_2, splashRange);
+    wwrite_epd(EPD(0x6570C8) + offset_2, byte_2, splashRange);
+    wwrite_epd(EPD(0x657780) + offset_2, byte_2, splashRange);
+
+    dwwrite_epd(EPD(0x657470) + weaponId, weaponRange);
+    bwrite_epd(EPD(0x662DB8) + unitId/4, unitId%4, weaponRange/32);
+}
+function CCMU_Check() {
+    if (Memory(0x628438, Exactly, 0)) return true;  // avoid EUDError when CCMU
+    return false;
+}
+
+function SetNextUnitEPD(){
+    return CUnit.from_next();
+}
+function Unit_Create(cp, unitId, startLoc, endLoc) {
+    if (CCMU_Check()) return false;  // avoid EUDError when CCMU
+    const epd = SetNextUnitEPD();
+    CreateUnit(1, unitId, startLoc, cp);
+    MoveUnit(1, unitId, cp, startLoc, endLoc);
+
+    return epd;
+}
+function Unit_Create_Sudden(cp, unitId, startLoc, endLoc, removeTimer) {
+    if (CCMU_Check()) return false;  // avoid EUDError when CCMU
+    const epd = SetNextUnitEPD();
+    CreateUnit(1, unitId, startLoc, cp);
+    MoveUnit(1, unitId, cp, startLoc, endLoc);
+    if(removeTimer != NONE) bwrite_epd(epd + 0x110/4, 0, removeTimer);
+
+    return epd;
+}
+function Unit_RemoveEffect(epd) {
+    bwrite_epd(epd + 0x92/4, 3, 4);
+}
+function Unit_Create_Special(cp, unitId, startLoc, endLoc, removeTimer, status) {
+    if (CCMU_Check()) return false;  // avoid EUDError when CCMU
+    const epd = SetNextUnitEPD();
+    if (status == 1) {
+        CreateUnitWithProperties(1, unitId, startLoc, cp, UnitProperty(
+            burrowed = true,
+        ));
+    }
+    // else if (status == 2) {
+    //     CreateUnitWithProperties(1, unitId, startLoc, cp, UnitProperty(
+    //         clocked = true,
+    //     ));
+    // }
+    else if (status == 3) {
+        CreateUnitWithProperties(1, unitId, startLoc, cp, UnitProperty(
+            hallucinated = true,
+        ));
+    }
+    MoveUnit(1, unitId, cp, startLoc, endLoc);
+    if(removeTimer != NONE) bwrite_epd(epd + 0x110/4, 0, removeTimer);
+
+    return epd;
+}
+
+
+const ScanUnit = 33;
+function ScanImage_Create(cp, ImageNum, ScriptId, ColorId, loc) { //스캔 이미지 변경
+    //이미지스크립트 272:점찍기 34:짧은이펙트
+    //색상 0:기본색 10:검정색 13:초록색 16:파란색
+    const Offset_4 = ImageNum/4;
+    const Byte_4 = ImageNum%4;
+    const Origin_ScriptId = dwread_epd(EPD(0x66EC48) + ImageNum);
+    const Origin_ColorId = bread_epd(EPD(0x669E28) + Offset_4, Byte_4);
+    //이미지 설정
+    wwrite_epd(EPD(0x666458), 0, ImageNum);
+    dwwrite_epd(EPD(0x66EC48) + ImageNum, ScriptId);
+    if (Origin_ColorId != ColorId) bwrite_epd(EPD(0x669E28) + Offset_4, Byte_4, ColorId);
+    CreateUnit(1, ScanUnit, loc, cp);
+    //이미지 초기화
+    wwrite_epd(EPD(0x666458), 0, 546);
+    dwwrite_epd(EPD(0x66EC48) + ImageNum, Origin_ScriptId);
+    if (Origin_ColorId != ColorId) bwrite_epd(EPD(0x669E28) + Offset_4, Byte_4, Origin_ColorId);
+}
+
+// function SetExtraDb(epd, Offset, Amount) {
+//     const xepd = epd + dst; 
+//     SetMemoryEPD(xepd + Offset, SetTo, Amount); //값 대입
+// }
+// function GetExtraDb(epd, Offset) {
+//     const xepd = epd + dst; 
+//     return dwread_epd(xepd + Offset);
+// }
+// function ExtraAddDb(epd, Offset, Amount) {
+//     const xepd = epd + dst; 
+//     SetMemoryEPD(xepd + Offset, Add, Amount); //값 대입
+// }
+// function ExtraSubDb(epd, Offset, Amount) {
+//     const xepd = epd + dst; 
+//     SetMemoryEPD(xepd + Offset, Subtract, Amount); //값 대입
+// }
+// function ExtraDb_Reset(epd) {
+//     const Usable = GetExtraDb(epd, 0);
+//     for (var i = 0; i < Usable+1; i++) {
+//         SetExtraDb(epd, i, 0);
+//     }
+// }
+
+function Unit_Healing_Count(epd, cp, amount) {
+    //음수 양수 모두 가능
+    const unitId = wread_epd(epd + 0x64/4, 0);
+    const unit = TrgUnit(unitId);
+    const maxHp = unit.maxHp;
+    const curHp = dwread_epd(epd + 0x08/4);
+    if (amount > 0x80000000)
+    {
+        if (curHp < amount)
+        {
+            dwwrite_epd(epd + 0x08/4, 0);
+            bwrite_epd(epd + 0x4C/4, 1, 0); //사망명령
+        }
+    }
+    else 
+    {
+        if (curHp + amount < maxHp)
+        {
+            dwadd_epd(epd + 0x08/4, amount);
+        }
+        else
+        {
+            dwwrite_epd(epd + 0x08/4, maxHp);
+        }
+    }
+}
+
+function Unit_Healing_Percent(epd, cp, per) {
+    //-100~100%
+    const unitId = wread_epd(epd + 0x64/4, 0);
+    const unit = TrgUnit(unitId);
+    const maxHp = unit.maxHp;
+    const curHp = dwread_epd(epd + 0x08/4);
+    if (per > 0x80000000)
+    { //음수 경우에는 체력 감소
+        const amount = maxHp * per / 100;
+        if (curHp - amount > 0)
+        {
+            dwsubtract_epd(epd + 0x08/4, amount);
+        }
+        else
+        { 
+            //사망명령
+            bwrite_epd(epd + 0x4C/4, 1, 0);
+            dwwrite_epd(epd + 0x08/4, 0);
+        }
+    }
+    else
+    {
+        const amount = maxHp * per / 100;
+        if (curHp + amount < maxHp)
+        {
+            dwadd_epd(epd + 0x08/4, amount);
+        }
+        else
+        {
+            dwwrite_epd(epd + 0x08/4, maxHp);
+        }
+    }
+}

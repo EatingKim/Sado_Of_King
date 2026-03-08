@@ -1,0 +1,217 @@
+import PluginVariables as msqcvar;
+import Sado_Object as sdo;
+import Sado_Death as sdd;
+import Sado_Plague as sdp;
+import TriggerEditor.TETools as TE;
+import System as sy;
+import ArrayPool as ap;
+
+const targetLoc = $L("Target");
+const bufferLoc = $L("Buffer");
+const searchLoc = $L("Skill_Range");
+const heroLoc = $L("Hero");
+var Index = 0;
+
+function Skill_Upgrade_Check(cp);
+
+
+const extraDb = Db(1700*336); //추가 구조오프셋 장소
+const dst = (extraDb - 0x59CCA8) / 4; //구조오프셋과 추가장소 사이의 거리
+object SetButton {
+    var pointer_epd;
+    var epd;
+
+    /*
+    btn_pos는 현재 버튼의 상대적 위치
+    XX1 모양일 때, 1은 3번째에 위치하고 있지만
+    XXX 없는 버튼을 제외하면 첫번째 버튼이므로
+    2XX btn_pos는 0이 된다.
+    */
+
+    function constructor(btn_idx, btn_pos)
+    {
+        // offset_epd | 0:button number, 1:button_address, 2:unknown
+        const offset_epd = EPD(0x5187E8);
+        this.pointer_epd = offset_epd + (btn_idx*3) + 1;
+        this.epd = epdread_epd(this.pointer_epd) + 5 * btn_pos;
+    }
+
+    function SetPos(pos)
+    {
+        // 1 ~ 9 사이의 값
+        if(pos == 0 || pos > 9) return false;
+        SetMemoryXEPD(this.epd, SetTo, pos, 0xFFFF);
+    }
+
+    function SetIcon(icon)
+    {
+        SetMemoryXEPD(this.epd, SetTo, icon << 16, 0xFFFF0000);
+    }
+
+    function SetCond(cond)
+    {
+        SetMemoryEPD(this.epd+1, SetTo, cond);
+    }
+
+    function SetCondValue(cond_value)
+    {
+        SetMemoryXEPD(this.epd+3, SetTo, cond_value, 0xFFFF);
+    }
+
+    function SetAction(action)
+    {
+        SetMemoryEPD(this.epd+2, SetTo, action);
+    }
+
+    function SetActionValue(action_value)
+    {
+        SetMemoryXEPD(this.epd+3, SetTo, action_value << 16, 0xFFFF0000);
+    }
+
+    function SetEnableTbl(enable_tbl)
+    {
+        SetMemoryXEPD(this.epd+4, SetTo, enable_tbl, 0xFFFF);
+    }
+
+    function SetDisableTbl(disable_tbl)
+    {
+        SetMemoryXEPD(this.epd+4, SetTo, disable_tbl << 16, 0xFFFF0000);
+    }
+
+    function Update() {
+        SetMemoryEPD(this.pointer_epd, Add, 0);
+    }
+};
+const sado_Main = EUDArray(4);
+function Sado_SKill(cp) {
+    const sado = sdo.Sado.cast(sado_Main[cp]);
+    const curskill = sado.skillList[sado.skillListIndex];
+    if (sado.isAlive == 0) return;
+    if (curskill > 0)
+    { //큐에 저장된 스킬이 있으면
+        if (sado.comboTimer <= 6)
+        {
+            const cond = sado.Skill(P1, curskill);
+            if (cond)
+            {
+                sado.skillList[sado.skillListIndex] = 0;
+                if (sado.skillListIndex < 29) sado.skillListIndex += 1;
+                else sado.skillListIndex = 0;
+            }
+        }
+    }
+    if (sado.comboTimer > 0 && sado.comboTimer <= 20)
+    {
+        sado.comboTimer -= 1;
+    }
+    if (sado.comboTimer == 0 && sado.curSkillCombo != 0)
+    {
+        sado.curSkillCombo = 0;
+    }
+}
+
+function init() {
+    sdd.init_death();
+    // sdp.init_plague();
+    for (var i = 0; i < 4; i++) {
+        sado_Main[i] = sdo.Sado.alloc();
+    }
+    const temp = sy.SetNextUnitEPD();
+    CreateUnit(1, 36, "Anywhere", P2);
+    const sado_Death = sdo.Sado.cast(sado_Main[0]);
+    {
+        const epd = sy.SetNextUnitEPD();
+        CreateUnit(1, 0, "Anywhere", P1);
+        SetMemoryXEPD(epd + 0xDC/4, SetTo, 0x900000, 0x900000);
+        sado_Death.type = 1;
+        sado_Death.epd = epd;
+        sado_Death.isAlive = true;
+        sdo.Skill_Info_init(sado_Death);
+    }
+    return temp;
+}
+const skillList_Unit = [37, 38, 39, 40];
+const skillList_Index = [0, 0, 0, 0];
+function Hero_Play(cp) {
+    //스킬 업그레이드 체크
+    Skill_Upgrade_Check(cp);
+    const sado = sdo.Sado.cast(sado_Main[cp]);
+    //죽어있다면 실행하지 않음
+    if (sado.isAlive == 0) return;
+    //영웅에게 로케이션 이동
+    MoveLocation(heroLoc, 0, cp, "Anywhere");
+    //스킬 발동 확인
+    Sado_SKill(cp);
+    switch (sado.type) {
+        case 1:
+            sdd.Death_Skill_Main(cp, sado_Main);
+            sdd.Death_UnitGroup(cp, sado.group_Order);
+            break;
+        case 2:
+            break;
+    
+        default:
+            break;
+    }
+}
+function Hero_InputCheck(cp, input) {
+    const ptr, epd = cunitepdread_epd(EPD(0x6284E8) + 12 * cp);
+    if (!epd) return;  //클릭한 유닛이 없으면 다음 플레이어 차례로 넘어간다
+    const sado = sdo.Sado.cast(sado_Main[cp]);
+    if (epd == sado.epd) //영웅
+    {
+        for (var i = 0; i < 4; i++) {
+            if (TE.BuildCheckEPD(epd, skillList_Unit[i]))
+            {
+                TE.BuildResetEPD(epd);
+                sado.skillList[skillList_Index[cp]] = i + 1;
+                if (skillList_Index[cp] < 29) skillList_Index[cp] += 1;
+                else skillList_Index[cp] = 0;
+            }
+        }
+        if (TE.BuildCheckEPD(epd, 41)) //힐링
+        {
+            //큐에 들어가지 않고 바로 실행
+            TE.BuildResetEPD(epd);
+            sy.Unit_Healing_Percent(epd, cp, 100);
+        }
+        //하수인 명령은 키 입력으로 대체
+        //1: 하수인 집결, 2: 하수인 거점 4: 하수인 생성(800미네랄)
+        sado.group_Order = input;
+    }
+}
+
+const skillUp_Main_loc = $L("Skill_Main");
+const skillUp_Q_loc = $L("Skill_Up_Q");
+const skillUp_W_loc = $L("Skill_Up_W");
+const skillUp_E_loc = $L("Skill_Up_E");
+const skillUp_R_loc = $L("Skill_Up_R");
+
+function Skill_Upgrade_Check(cp) {
+    const sado = sdo.Sado.cast(sado_Main[cp]);
+
+    for (var i = 0; i < 4; i++) {
+        if (Bring(cp, AtLeast, 1, "Men", skillUp_Q_loc+i))
+        {
+            MoveUnit(1, "Men", cp, skillUp_Q_loc+i, skillUp_Main_loc);
+            sado.Skill_Enhance(1+i);
+        }
+        if (Bring(cp, AtLeast, 1, "Men", skillUp_W_loc+i))
+        {
+            MoveUnit(1, "Men", cp, skillUp_W_loc+i, skillUp_Main_loc);
+            sado.Skill_Enhance(5+i);
+        }
+    }
+    for (var i = 0; i < 2; i++) {
+        if (Bring(cp, AtLeast, 1, "Men", skillUp_E_loc+i))
+        {
+            MoveUnit(1, "Men", cp, skillUp_E_loc+i, skillUp_Main_loc);
+            sado.Skill_Enhance(9+i);
+        }
+    }
+    if (Bring(cp, AtLeast, 1, "Men", skillUp_R_loc))
+    {
+        MoveUnit(1, "Men", cp, skillUp_R_loc, skillUp_Main_loc);
+        sado.Skill_Enhance(11);
+    }
+}

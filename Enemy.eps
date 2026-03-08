@@ -1,0 +1,24 @@
+import PluginVariables as msqcvar;
+
+import System as sy;
+
+var summonTimer = 0;
+
+function TestSummon(cp) {
+    if (summonTimer == 0)
+    {
+        summonTimer = 120;
+        for (var i = 0; i < 12; i++) {
+            if (Command(cp, AtLeast, 120, 37)) break;
+            const x, y = getlocTL(sy.heroLoc);
+            const dx = rand()%480-240;
+            const dy = rand()%480-240;
+            setloc(sy.tempLoc, x + dx, y + dy);
+            sy.Unit_Create(cp, 37, sy.bufferLoc, sy.tempLoc);
+        }
+        Order(37, cp, sy.centerLoc, Patrol, sy.heroLoc);
+    }
+    else {
+        summonTimer -= 1;
+    }
+}

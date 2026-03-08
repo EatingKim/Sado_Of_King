@@ -15,8 +15,6 @@ var Index = 0;
 function Skill_Upgrade_Check(cp);
 
 
-const extraDb = Db(1700*336); //추가 구조오프셋 장소
-const dst = (extraDb - 0x59CCA8) / 4; //구조오프셋과 추가장소 사이의 거리
 object SetButton {
     var pointer_epd;
     var epd;
@@ -178,6 +176,24 @@ function Hero_InputCheck(cp, input) {
         //하수인 명령은 키 입력으로 대체
         //1: 하수인 집결, 2: 하수인 거점 4: 하수인 생성(800미네랄)
         sado.group_Order = input;
+    }
+    else 
+    {
+        const unitId = wread_epd(epd + 0x64/4, 0);
+        if (unitId == 22)
+        {
+            //버튼셋 텍스트 수정
+            const index = wread_epd(epd + 0x8C/4, 0);
+            settblf(626, 2, "\x04거점 그룹 \x03{}\x04번", index+1);
+            //거점 유닛
+            if (TE.BuildCheckEPD(epd, 21))
+            {
+                //거점 제거
+                TE.BuildResetEPD(epd);
+                if (sado.type == 1) sdd.Death_FOB_Remove(cp, index);
+                bwrite_epd(epd + 0x4C/4, 1, 0);
+            }
+        }
     }
 }
 

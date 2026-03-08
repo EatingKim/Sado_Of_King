@@ -142,28 +142,52 @@ function ScanImage_Create(cp, ImageNum, ScriptId, ColorId, loc) { //스캔 이�
     if (Origin_ColorId != ColorId) bwrite_epd(EPD(0x669E28) + Offset_4, Byte_4, Origin_ColorId);
 }
 
-// function SetExtraDb(epd, Offset, Amount) {
-//     const xepd = epd + dst; 
-//     SetMemoryEPD(xepd + Offset, SetTo, Amount); //값 대입
-// }
-// function GetExtraDb(epd, Offset) {
-//     const xepd = epd + dst; 
-//     return dwread_epd(xepd + Offset);
-// }
-// function ExtraAddDb(epd, Offset, Amount) {
-//     const xepd = epd + dst; 
-//     SetMemoryEPD(xepd + Offset, Add, Amount); //값 대입
-// }
-// function ExtraSubDb(epd, Offset, Amount) {
-//     const xepd = epd + dst; 
-//     SetMemoryEPD(xepd + Offset, Subtract, Amount); //값 대입
-// }
-// function ExtraDb_Reset(epd) {
-//     const Usable = GetExtraDb(epd, 0);
-//     for (var i = 0; i < Usable+1; i++) {
-//         SetExtraDb(epd, i, 0);
-//     }
-// }
+const extraDb = Db(1700*336); //추가 구조오프셋 장소
+const dst = (extraDb - 0x59CCA8) / 4; //구조오프셋과 추가장소 사이의 거리
+function SetExtraDb(epd, Offset, Amount) {
+    const xepd = epd + dst; 
+    SetMemoryEPD(xepd + Offset, SetTo, Amount); //값 대입
+}
+function GetExtraDb(epd, Offset) {
+    const xepd = epd + dst; 
+    return dwread_epd(xepd + Offset);
+}
+function ExtraAddDb(epd, Offset, Amount) {
+    const xepd = epd + dst; 
+    SetMemoryEPD(xepd + Offset, Add, Amount); //값 대입
+}
+function ExtraSubDb(epd, Offset, Amount) {
+    const xepd = epd + dst; 
+    SetMemoryEPD(xepd + Offset, Subtract, Amount); //값 대입
+}
+function ExtraDb_Reset(epd) {
+    const Usable = GetExtraDb(epd, 0);
+    for (var i = 0; i < Usable+1; i++) {
+        SetExtraDb(epd, i, 0);
+    }
+}
+
+function Hypot(x, y){
+    if (x >= 0x80000000) x = -x;
+    if (y >= 0x80000000) y = -y;
+    var t = 0;
+    if(x < y){ t = x; x = y; y = t; } //Swap x, y so that y <= x
+    var d = y + y - x;
+    if(d >= 0x80000000) d=0;
+    d += y;
+    t = x + d / 5;
+    return t;
+}
+const loc_table = EPD(0x58DC4C);
+function LocationDistance(loc1, loc2) {
+    const a = loc_table+5*loc1;
+    const b = loc_table+5*loc2;
+    const x1 = maskread_epd(a, 0x1FFF) + maskread_epd(a+2, 0x1FFF);
+    const y1 = maskread_epd(a+1, 0x1FFF) + maskread_epd(a+3, 0x1FFF);
+    const x2 = maskread_epd(b, 0x1FFF) + maskread_epd(b+2, 0x1FFF);
+    const y2 = maskread_epd(b+1, 0x1FFF) + maskread_epd(b+3, 0x1FFF);
+    return Hypot(x1-x2, y1-y2);
+}
 
 function Unit_Healing_Count(epd, cp, amount) {
     //음수 양수 모두 가능

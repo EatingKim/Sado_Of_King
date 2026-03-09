@@ -2,6 +2,7 @@ import PluginVariables as msqcvar;
 import Sado_Object as sdo;
 import Sado_Death as sdd;
 import Sado_Plague as sdp;
+import Sado_DiagramData as dd;
 import TriggerEditor.TETools as TE;
 import System as sy;
 import ArrayPool as ap;
@@ -98,19 +99,20 @@ function Sado_SKill(cp) {
             }
         }
     }
+    printAllAt(8, "콤보 타이머: {} 콤보: {}", sado.comboTimer, sado.curSkillCombo);
     if (sado.comboTimer > 0 && sado.comboTimer <= 20)
     {
         sado.comboTimer -= 1;
     }
     if (sado.comboTimer == 0 && sado.curSkillCombo != 0)
     {
+        sado.Skill_Remove(cp);
         sado.curSkillCombo = 0;
     }
 }
 
 function init() {
-    sdd.init_death();
-    // sdp.init_plague();
+    dd.init();
     for (var i = 0; i < 4; i++) {
         sado_Main[i] = sdo.Sado.alloc();
     }
@@ -121,7 +123,7 @@ function init() {
         const epd = sy.SetNextUnitEPD();
         CreateUnit(1, 0, "Anywhere", P1);
         SetMemoryXEPD(epd + 0xDC/4, SetTo, 0x900000, 0x900000);
-        sado_Death.type = 1;
+        sado_Death.type = 2;
         sado_Death.epd = epd;
         sado_Death.isAlive = true;
         sdo.Skill_Info_init(sado_Death);
@@ -146,6 +148,8 @@ function Hero_Play(cp) {
             sdd.Death_UnitGroup(cp, sado.group_Order);
             break;
         case 2:
+            sdp.Plague_Skill_Main(cp, sado_Main);
+            sdp.Plague_UnitGroup(cp, sado.group_Order);
             break;
     
         default:
@@ -191,6 +195,7 @@ function Hero_InputCheck(cp, input) {
                 //거점 제거
                 TE.BuildResetEPD(epd);
                 if (sado.type == 1) sdd.Death_FOB_Remove(cp, index);
+                else if (sado.type == 2) sdp.Plague_FOB_Remove(cp, index);
                 bwrite_epd(epd + 0x4C/4, 1, 0);
             }
         }

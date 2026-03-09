@@ -117,7 +117,7 @@ function Unit_Create_Special(cp, unitId, startLoc, endLoc, removeTimer, status) 
         ));
     }
     MoveUnit(1, unitId, cp, startLoc, endLoc);
-    if(removeTimer != NONE) bwrite_epd(epd + 0x110/4, 0, removeTimer);
+    if(removeTimer > 0) bwrite_epd(epd + 0x110/4, 0, removeTimer);
 
     return epd;
 }

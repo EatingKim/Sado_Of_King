@@ -1,0 +1,27 @@
+
+import draw as dw;
+
+
+const shape_Cross_dx = EUDArray(4);
+const shape_Cross_dy = EUDArray(4);
+const shape_Straight_dx = EUDArray(4);
+const shape_Straight_dy = EUDArray(4);
+const shape_Circle_32 = dw.Circle("Target", 32, dots=16);
+const shape_Circle_64 = dw.Circle("Target", 64, dots=16);
+const shape_Circle_96 = dw.Circle("Target", 96, dots=16);
+const shape_Circle_128 = dw.Circle("Target", 128, dots=16);
+const shape_Square_3 = dw.RegularPolygon("Target", 4, 68, dots=8, rotation=-45);
+const shape_Square_5 = dw.RegularPolygon("Target", 4, 136, dots=16, rotation=-45);
+const shape_Square_7 = dw.RegularPolygon("Target", 4, 204, dots=24, rotation=-45);
+const shape_Square_9 = dw.RegularPolygon("Target", 4, 272, dots=32, rotation=-45);
+const shape_Square_11 = dw.RegularPolygon("Target", 4, 339, dots=40, rotation=-45);
+const shape_Square_13 = dw.RegularPolygon("Target", 4, 407, dots=48, rotation=-45);
+const shape_Square_15 = dw.RegularPolygon("Target", 4, 475, dots=56, rotation=-45);
+
+
+function init() {
+    for (var i = 0; i < 4; i++) {
+        shape_Cross_dx[i], shape_Cross_dy[i] = lengthdir(68, 45 + i*90);
+        shape_Straight_dy[i], shape_Straight_dy[i] = lengthdir(68, i*90);
+    }
+}

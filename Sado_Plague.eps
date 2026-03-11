@@ -4,6 +4,7 @@ import TriggerEditor.TETools as TE;
 import Sado_Object as sdo;
 import draw as dw;
 import ScData as sc;
+import Sado_DiagramData as dd;
 
 const Plague_SkillGroup = UnitGroup(500);
 const Plague_MinionGroup_Main = UnitGroup(500);
@@ -12,11 +13,15 @@ const Plague_MinionGroup_FOB_2 = UnitGroup(500);
 const Plague_MinionGroup_FOB_3 = UnitGroup(500);
 var minion_Cost = 800;
 var minion_Limit = 36;
+var minion_Cur = 0;
 const FOB_Count = EUDArray(3);
 const FOB_Exist = EUDArray(3);
 const FOB_Epd = EUDArray(3);
 var Plague_GroupControl = 0;
+var Plague_SkillControl = 0;
 var temp_Count = 0;
+var toogle_Minion_Upgrade = false;
+var Plague_tempHeal = 0;
 
 const targetLoc = $L("Target");
 const bufferLoc = $L("Buffer");
@@ -35,6 +40,8 @@ const skill_Unit_2 = TrgUnit(103);
 const skill_Unit_2_Sprite = Sprite(485);
 const skill_Unit_2_Weapon = Weapon(109);
 const skill_Unit_2_Weapon_Sprite = Sprite(511);
+const skill_Unit_3 = TrgUnit(16);
+const skill_Unit_3_Weapon = Weapon(20);
 const effect_Unit = TrgUnit(19);
 const effect_Unit_Sprite = Sprite(285);
 const dummyUnit = TrgUnit(204);
@@ -43,6 +50,7 @@ const FOB_Unit = TrgUnit(22);
 
 const plague_Curruption = TrgUnit(13);
 const plague_Curruption_Weapon = Weapon(34);
+var plague_Curruption_Count = 0;
 
 const plague_Minion_Unit = TrgUnit(15);
 const plague_Minion_Unit_Weapon = Weapon(22);
@@ -83,17 +91,18 @@ function Plague_UnitSetting_Reset() {
     skill_Unit_1.airWeapon = 50;
     sc.Reset_Change(effect_Unit_Sprite);
     sc.Reset_Change(skill_Unit_1_Sprite);
-    sc.Reset_Change(skill_Unit_2_Sprite);
     sc.Reset_Change(skill_Unit_1_Weapon_Sprite);
-    sc.Reset_Change(skill_Unit_2_Weapon_Sprite);
 }
 
 function Plague_UnitSetting(cp, type, isEnhance) {
     switch (type) {
         case 1: 
             skill_Unit_1.seekRange = 0;
+            skill_Unit_1.buildingDimensions = 65537;
             skill_Unit_1_Sprite.image = sc.image_Scourge;
             skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Green;
+            skill_Unit_1.groundWeapon = 50;
+            skill_Unit_1.airWeapon = 50;
             skill_Unit_1_Weapon.damage = 0;
             skill_Unit_1_Weapon.damageBonus = 0;
             skill_Unit_1_Weapon_Sprite.image = sc.image_WCircle;
@@ -122,6 +131,8 @@ function Plague_UnitSetting(cp, type, isEnhance) {
             skill_Unit_1.seekRange = 0;
             skill_Unit_1_Sprite.image = sc.image_Scourge;
             skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Green;
+            skill_Unit_1.groundWeapon = 50;
+            skill_Unit_1.airWeapon = 50;
             skill_Unit_1_Weapon.damage = 0;
             skill_Unit_1_Weapon.damageBonus = 0;
             skill_Unit_1_Weapon_Sprite.image = sc.image_WCircle;
@@ -132,6 +143,10 @@ function Plague_UnitSetting(cp, type, isEnhance) {
             skill_Unit_1_Weapon.splashMiddleRadius = 0;
             skill_Unit_1_Weapon.splashOuterRadius = 0;
             skill_Unit_1.flingy.topSpeed = 850;
+            if (isEnhance)
+            {
+                skill_Unit_1.flingy.topSpeed = 1250;
+            }
 
             skill_Unit_2.seekRange = 6;
             skill_Unit_2_Sprite.image = sc.image_Lurker;
@@ -150,6 +165,8 @@ function Plague_UnitSetting(cp, type, isEnhance) {
             skill_Unit_1.seekRange = 8;
             skill_Unit_1_Sprite.image = sc.image_Hydra;
             skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_1.groundWeapon = 50;
+            skill_Unit_1.airWeapon = 50;
             skill_Unit_1_Weapon.damage = 9;
             skill_Unit_1_Weapon.damageBonus = 3;
             skill_Unit_1_Weapon_Sprite.image = sc.image_Needle;
@@ -166,6 +183,8 @@ function Plague_UnitSetting(cp, type, isEnhance) {
             skill_Unit_1.seekRange = 0;
             skill_Unit_1_Sprite.image = sc.image_Scourge;
             skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Green;
+            skill_Unit_1.groundWeapon = 50;
+            skill_Unit_1.airWeapon = 50;
             skill_Unit_1_Weapon.damage = 0;
             skill_Unit_1_Weapon.damageBonus = 0;
             skill_Unit_1_Weapon_Sprite.image = sc.image_WCircle;
@@ -176,6 +195,10 @@ function Plague_UnitSetting(cp, type, isEnhance) {
             skill_Unit_1_Weapon.splashMiddleRadius = 0;
             skill_Unit_1_Weapon.splashOuterRadius = 0;
             skill_Unit_1.flingy.topSpeed = 850;
+            if (isEnhance)
+            {
+                skill_Unit_1.flingy.topSpeed = 1250;
+            }
 
             skill_Unit_2.seekRange = 6;
             skill_Unit_2_Sprite.image = sc.image_Lurker;
@@ -192,8 +215,11 @@ function Plague_UnitSetting(cp, type, isEnhance) {
             break;
         case 5:
             skill_Unit_1.seekRange = 9;
+            skill_Unit_1.buildingDimensions = 65537;
             skill_Unit_1_Sprite.image = sc.image_Hydra;
             skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_1.groundWeapon = 50;
+            skill_Unit_1.airWeapon = 50;
             skill_Unit_1_Weapon.damage = 22;
             skill_Unit_1_Weapon.damageBonus = 6;
             skill_Unit_1_Weapon_Sprite.image = sc.image_Needle;
@@ -208,7 +234,7 @@ function Plague_UnitSetting(cp, type, isEnhance) {
             break;
         case 6:
             skill_Unit_1.seekRange = 9;
-            skill_Unit_1.buildingDimensions = 0;
+            skill_Unit_1.buildingDimensions = 1;
             skill_Unit_1_Sprite.image = sc.image_Hydra;
             skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
             skill_Unit_1.groundWeapon = 34;
@@ -222,7 +248,7 @@ function Plague_UnitSetting(cp, type, isEnhance) {
             break;
         case 7:
             skill_Unit_1.seekRange = 9;
-            skill_Unit_1.buildingDimensions = 0;
+            skill_Unit_1.buildingDimensions = 1;
             skill_Unit_1_Sprite.image = sc.image_Hydra;
             skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
             skill_Unit_1.groundWeapon = 34;
@@ -234,19 +260,33 @@ function Plague_UnitSetting(cp, type, isEnhance) {
 
             effect_Unit_Sprite.image = sc.image_Queen;
             break;
+        case 8:
+            skill_Unit_1.seekRange = 0;
+            skill_Unit_1.buildingDimensions = 65537;
+            skill_Unit_1_Sprite.image = sc.image_Scourge;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Green;
+            skill_Unit_1.groundWeapon = 50;
+            skill_Unit_1.airWeapon = 50;
+            skill_Unit_1_Weapon.damage = 0;
+            skill_Unit_1_Weapon.damageBonus = 0;
+            skill_Unit_1_Weapon_Sprite.image = sc.image_WCircle;
+            skill_Unit_1_Weapon.maxRange = 0*32;
+            skill_Unit_1_Weapon.behavior = sc.behavior_Melee;
+            skill_Unit_1_Weapon.explosionType = sc.explosion_Basic;
+            skill_Unit_1_Weapon.splashInnerRadius = 0;
+            skill_Unit_1_Weapon.splashMiddleRadius = 0;
+            skill_Unit_1_Weapon.splashOuterRadius = 0;
+            skill_Unit_1.flingy.topSpeed = 850;
+            if (isEnhance)
+            {
+                skill_Unit_1.flingy.topSpeed = 1250;
+            }
+
+            effect_Unit_Sprite.image = sc.image_Scantid;
+            effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
+            break;
         case 9:
-            skill_Unit_1.seekRange = 7;
-            skill_Unit_1_Sprite.image = sc.image_Mutal;
-            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
-            skill_Unit_1_Weapon.damage = 16;
-            skill_Unit_1_Weapon.damageBonus = 3;
-            skill_Unit_1_Weapon_Sprite.image = sc.image_Seeker;
-            skill_Unit_1_Weapon.maxRange = 7*32;
-            skill_Unit_1_Weapon.behavior = sc.behavior_Targetloc;
-            skill_Unit_1_Weapon.explosionType = sc.explosion_Cluster;
-            skill_Unit_1_Weapon.splashInnerRadius = 20;
-            skill_Unit_1_Weapon.splashMiddleRadius = 20;
-            skill_Unit_1_Weapon.splashOuterRadius = 20;
+            effect_Unit_Sprite.image = sc.image_Queen;
             break;
         case 10:
             skill_Unit_1.seekRange = 10;
@@ -266,25 +306,6 @@ function Plague_UnitSetting(cp, type, isEnhance) {
             effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
             break;
         case 11:
-            skill_Unit_1.seekRange = 10;
-            skill_Unit_1_Sprite.image = sc.image_Mutal;
-            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
-            skill_Unit_1_Weapon.damage = 27;
-            skill_Unit_1_Weapon.damageBonus = 5;
-            skill_Unit_1_Weapon_Sprite.image = sc.image_Venom;
-            skill_Unit_1_Weapon.maxRange = 10*32;
-            skill_Unit_1_Weapon.behavior = sc.behavior_Targetunit;
-            skill_Unit_1_Weapon.explosionType = sc.explosion_Basic;
-            skill_Unit_1_Weapon.splashInnerRadius = 0;
-            skill_Unit_1_Weapon.splashMiddleRadius = 0;
-            skill_Unit_1_Weapon.splashOuterRadius = 0;
-
-            skill_Unit_2.buildingDimensions = 65537;
-            skill_Unit_2_Sprite.image = sc.image_DarkA;
-            skill_Unit_2_Sprite.image.drawingFunction = sc.drawing_Origin;
-
-            effect_Unit_Sprite.image = sc.image_Devour;
-            effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
             break;
     
         default:
@@ -305,7 +326,7 @@ function Plague_Skill(cp, epd, type, timer, max) {
             if (timer == 0)
             {
                 temp_Count = 0;
-                sy.Unit_Create(cp, skill_Unit_1, bufferLoc, heroLoc);
+                Plague_SkillGroup.add(sy.Unit_Create(cp, skill_Unit_1, bufferLoc, heroLoc));
             }
             if (timer < 5*12)
             {
@@ -325,19 +346,7 @@ function Plague_Skill(cp, epd, type, timer, max) {
         case 2: //Q-Q
             if (timer == 0)
             {
-                MoveLocation(tempLoc, skill_Unit_1, cp, centerLoc);
-                const x, y = getlocTL(tempLoc);
-                KillUnitAt(1, skill_Unit_1, tempLoc, cp);
-                const angle = rand()%120;
-                for (var i = 0; i < 3; i++) {
-                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, tempLoc);
-                    bwrite_epd(epd + 0x84/4, 2, 1);
-                    wwrite_epd(epd + 0x8C/4, 0, 0);
-                    sy.SetExtraDb(epd, 0, 5);
-                    sy.SetExtraDb(epd, 1, angle + i*120); //이동 각도
-                    sy.SetExtraDb(epd, 2, 3); //생성 최대치
-                    Plague_SkillGroup.add(epd);
-                }
+                Plague_SkillControl += 1;
             }
             break;
         case 3: //Q-Q-Q
@@ -362,22 +371,7 @@ function Plague_Skill(cp, epd, type, timer, max) {
         case 4: //Q-Q-W
             if (timer == 0)
             {
-                for (var i = 0; i < 3; i++) {
-                    MoveLocation(tempLoc, skill_Unit_1, cp, centerLoc);
-                    const x, y = getlocTL(tempLoc);
-                    RemoveUnitAt(1, skill_Unit_1, tempLoc, cp);
-                    const angle = rand()%120;
-                    for (var j = 0; j < 3; j++) {
-                        const epd = sy.Unit_Create(P8, skill_Unit_1, bufferLoc, tempLoc);
-                        bwrite_epd(epd + 0x84/4, 2, 1);
-                        wwrite_epd(epd + 0x8C/4, 0, 0);
-                        sy.SetExtraDb(epd, 0, 5);
-                        sy.SetExtraDb(epd, 1, angle + j*120); //이동 각도
-                        sy.SetExtraDb(epd, 2, 4); //생성 최대치
-                        Plague_SkillGroup.add(epd);
-                    }
-                }
-                GiveUnits(All, skill_Unit_1, P8, centerLoc, cp);
+                Plague_SkillControl += 1;
             }
             if (timer == max)
             {
@@ -394,19 +388,31 @@ function Plague_Skill(cp, epd, type, timer, max) {
         case 6: //W-Q
             if (timer == 0)
             {
-                for (var i = 0; i < 4; i++) {
-                    const epd = sy.Unit_Create(cp, plague_Curruption, bufferLoc, heroLoc);
-                    const tepd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, heroLoc, 8);
-                    const cunit = CUnit.cast(epd);
-                    const tcunit = CUnit.cast(tepd);
-                    tcunit.orderTarget = cunit;
-                    tcunit.order = 10;
-                    sy.SetExtraDb(cunit, 0, 5);
-                    sy.SetExtraDb(cunit, 1, 25*24);
-                    Plague_SkillGroup.add(epd);
+                const x, y = getlocTL(heroLoc);
+                for (var i = 0; i < 2; i++) {
+                    if (plague_Curruption_Count < 6)
+                    {
+                        setloc(tempLoc, x + dd.shape_Cross_dx[i*2], y + dd.shape_Cross_dy[i*2]);
+                        const epd = sy.Unit_Create(cp, plague_Curruption, bufferLoc, tempLoc);
+                        const tepd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
+                        if (epd && tepd)
+                        {
+                            //둘다 문제 없이 생성될 때에만 그룹에 넣기
+                            const cunit = CUnit.cast(epd);
+                            const tcunit = CUnit.cast(tepd);
+                            tcunit.orderTarget = cunit;
+                            tcunit.order = 10;
+                            cunit.unknown0x86 = 2;
+                            cunit.unknown0x8C = 0;
+                            Plague_SkillGroup.add(epd);
+                            plague_Curruption_Count += 1;
+                        } else {
+                            if (epd) bwrite_epd(epd + 0x4C/4, 1, 0);
+                        }
+                    }
                 }
             }
-            if (timer == 6)
+            if (timer == max)
             {
                 SetInvincibility(Enable, plague_Curruption, cp, centerLoc);
             }
@@ -417,13 +423,43 @@ function Plague_Skill(cp, epd, type, timer, max) {
                 Plague_GroupControl += 2; //이레딧 공격 설정
             }
             break;
-        case 8: //W-W
+        case 8: //W-Q-W
+            if (timer == 0)
+            {
+                Plague_SkillControl += 4;
+            }
+            if (timer == max)
+            {
+                KillUnit(skill_Unit_1, cp);
+                KillUnit(skill_Unit_2, cp);
+            }
             break;
         case 9: //E
+            if (timer == 0)
+            {
+                Plague_GroupControl += 16; //하수인 분열!
+            }
             break;
         case 10: //E-Q
+            if (timer == 0)
+            {
+                Plague_GroupControl += 4; //하수인 공&이속 업 시작
+                plague_Minion_Unit_Weapon.cooldown = 9;
+                toogle_Minion_Upgrade = true;
+            }
+            if (timer == max)
+            {
+                Plague_GroupControl += 8; //하수인 공&이속 업 끝
+                plague_Minion_Unit_Weapon.cooldown = 14;
+                toogle_Minion_Upgrade = false;
+            }
             break;
         case 11: //R
+            Plague_GroupControl += 64;
+            if (timer%24 == 0)
+            {
+                Plague_GroupControl += 1;
+            }
             break;
     
         default:
@@ -437,13 +473,174 @@ function Plague_Skill(cp, epd, type, timer, max) {
     return false;
 }
 function Plague_Skill_Enhance(cp, epd, type, timer, max) {
+    if (timer == 0) Plague_UnitSetting(cp, type, 0);
+    const Ncp = cp + 8;
+    switch (type) {
+        case 1: //Q
+            const x, y = getlocTL(heroLoc);
+            setloc(searchLoc, x, y);
+            dilateloc(searchLoc, 160, 160);
+            MoveLocation(targetLoc, "Men", NonAlliedVictoryPlayers, searchLoc);
+            Order(skill_Unit_1, cp, centerLoc, Move, targetLoc);
+            if (timer == 0)
+            {
+                temp_Count = 0;
+                Plague_SkillGroup.add(sy.Unit_Create(cp, skill_Unit_1, bufferLoc, heroLoc));
+            }
+            if (timer < 6*12)
+            {
+                if (timer%12 == 0)
+                {
+                    //럴커 생성
+                    MoveLocation(tempLoc, skill_Unit_1, cp, centerLoc);
+                    sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, tempLoc, 0, 1);
+                    sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, tempLoc, 0, 1);
+                    //이펙트 유닛
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    KillUnit(effect_Unit, cp);
+                    temp_Count += 2;
+                }
+            }
+            break;
+        case 2: //Q-Q
+            if (timer == 0)
+            {
+                Plague_SkillControl += 2;
+            }
+            break;
+        case 3: //Q-Q-Q
+            if (timer == 0)
+            {
+                KillUnit(skill_Unit_1, cp);
+                var attempt = 0;
+                while (temp_Count > 0) {
+                    RemoveUnit(0, P12);
+                    MoveLocation(tempLoc, skill_Unit_2, cp, centerLoc);
+                    RemoveUnitAt(1, skill_Unit_2, tempLoc, cp);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    temp_Count -= 1;
+                    attempt += 1;
+                    if (attempt > 300) {
+                        temp_Count = 0;
+                        break;
+                    }
+                }
+            }
+            KillUnit(effect_Unit, cp);
+            break;
+        case 4: //Q-Q-W
+            if (timer == 0)
+            {
+                Plague_SkillControl += 2;
+            }
+            if (timer == max)
+            {
+                KillUnit(skill_Unit_1, cp);
+                KillUnit(skill_Unit_2, cp);
+            }
+            break;
+        case 5: //W
+            if (timer == 0)
+            {
+                Plague_GroupControl += 128; //추가 공격 생성
+            }
+            break;
+        case 6: //W-Q
+            if (timer == 0)
+            {
+                const x, y = getlocTL(heroLoc);
+                for (var i = 0; i < 4; i++) {
+                    if (plague_Curruption_Count < 9)
+                    {
+                        setloc(tempLoc, x + dd.shape_Cross_dx[i], y + dd.shape_Cross_dy[i]);
+                        const epd = sy.Unit_Create(cp, plague_Curruption, bufferLoc, tempLoc);
+                        const tepd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
+                        if (epd && tepd)
+                        {
+                            //둘다 문제 없이 생성될 때에만 그룹에 넣기
+                            const cunit = CUnit.cast(epd);
+                            const tcunit = CUnit.cast(tepd);
+                            tcunit.orderTarget = cunit;
+                            tcunit.order = 10;
+                            cunit.unknown0x86 = 2;
+                            cunit.unknown0x8C = 0;
+                            Plague_SkillGroup.add(epd);
+                            plague_Curruption_Count += 1;
+                        } else {
+                            if (epd) bwrite_epd(epd + 0x4C/4, 1, 0);
+                        }
+                    }
+                }
+            }
+            if (timer == max)
+            {
+                SetInvincibility(Enable, plague_Curruption, cp, centerLoc);
+            }
+            break;
+        case 7: //W-Q-Q
+            if (timer == 0)
+            {
+                Plague_GroupControl += 2; //이레딧 공격 설정
+                Plague_tempHeal = 1;
+            }
+            break;
+        case 8: //W-Q-W
+            if (timer == 0)
+            {
+                Plague_SkillControl += 8;
+            }
+            if (timer == max)
+            {
+                KillUnit(skill_Unit_1, cp);
+                KillUnit(skill_Unit_2, cp);
+            }
+            break;
+        case 9: //E
+            if (timer == 0)
+            {
+                Plague_GroupControl += 512; //하수인 분열!
+            }
+            break;
+        case 10: //E-Q
+            if (timer == 0)
+            {
+                Plague_GroupControl += 4; //하수인 공&이속 업 시작
+                plague_Minion_Unit_Weapon.cooldown = 6;
+                toogle_Minion_Upgrade = true;
+            }
+            if (timer == max)
+            {
+                Plague_GroupControl += 8; //하수인 공&이속 업 끝
+                plague_Minion_Unit_Weapon.cooldown = 14;
+                toogle_Minion_Upgrade = false;
+            }
+            break;
+        case 11: //R
+            Plague_GroupControl += 64;
+            if (timer%24 == 0)
+            {
+                Plague_GroupControl += 128;
+            }
+            break;
+    
+        default:
+            break;
+    }
+    if (timer == max) 
+    {
+        Plague_UnitSetting_Reset();
+        return true;
+    }
     return false;
 }
 function Plague_Skill_Main(cp, sado_Main: EUDArray) {
     const sado = sdo.Sado.cast(sado_Main[cp]);
     for (var i = 1; i < 30; i++) {
         const info = sdo.Skill_Info.cast(sado.info[i]);
-        var cond = 0;
+        var cond = false;
         if (info.isActived)
         {
             if (info.isEnhance) cond = Plague_Skill_Enhance(cp, sado.epd, info.type, info.timer, info.maxtime);
@@ -453,25 +650,183 @@ function Plague_Skill_Main(cp, sado_Main: EUDArray) {
         if (cond) sado.ComboSetting(i);
     }
 }
-function Plague_SkillControl(cp, cunit: CUnit) {
+function Plague_FOB_alloc(cunit: CUnit) {
+    for (var i = 0; i < 3; i++) {
+        if (FOB_Exist[i] == true && FOB_Count[i] < 6)
+        {
+            FOB_Count[i] += 1;
+            if (i == 0) Plague_MinionGroup_FOB_1.add(cunit);
+            else if (i == 1) Plague_MinionGroup_FOB_2.add(cunit);
+            else if (i == 2) Plague_MinionGroup_FOB_3.add(cunit);
+            cunit.unknown0x86 = 0;
+            cunit.unknown0x8C = 0;
+            return true;
+        }
+    }
+    return false;
+}
+function Plague_FOB_alloc_ary(cunit: CUnit, type) {
+    var cond = 0;
+    if (FOB_Exist[type] == true && FOB_Count[type] < 6)
+    {
+        FOB_Count[type] += 1;
+        if (type == 0) {
+            Plague_MinionGroup_FOB_1.add(cunit);
+            cond = 1;
+        }
+        if (type == 1) {
+            Plague_MinionGroup_FOB_2.add(cunit);
+            cond = 1;
+        }
+        if (type == 2) {
+            Plague_MinionGroup_FOB_3.add(cunit);
+            cond = 1;
+        }
+        if (cond) {
+            cunit.unknown0x86 = 0;
+            cunit.unknown0x8C = 0;
+            return true;
+        }
+    }
+    return false;
+}
+function Plague_MinionSkill(cp, cunit: CUnit, type) {
     if (Plague_GroupControl & 1)
     {
+        //W스킬 소환
         cunit.setloc(tempLoc);
-        sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
-        sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
+        skill_Unit_3_Weapon.damage = 22;
+        skill_Unit_3_Weapon.damageBonus = 6;
+        const image_OriginId = effect_Unit_Sprite.image;
+        effect_Unit_Sprite.image = sc.image_Scourge;
+        sy.Unit_Create_Sudden(cp, skill_Unit_3, bufferLoc, tempLoc, 8);
+        sy.Unit_Create_Sudden(cp, skill_Unit_3, bufferLoc, tempLoc, 8);
         sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+        effect_Unit_Sprite.image = image_OriginId;
+        KillUnit(effect_Unit, cp);
+    }
+    if (Plague_GroupControl & 128)
+    {
+        //W스킬 소환
+        cunit.setloc(tempLoc);
+        skill_Unit_3_Weapon.damage = 22;
+        skill_Unit_3_Weapon.damageBonus = 6;
+        const image_OriginId = effect_Unit_Sprite.image;
+        effect_Unit_Sprite.image = sc.image_Scourge;
+        sy.Unit_Create_Sudden(cp, skill_Unit_3, bufferLoc, tempLoc, 8);
+        sy.Unit_Create_Sudden(cp, skill_Unit_3, bufferLoc, tempLoc, 8);
+        sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, tempLoc, 18, 1);
+        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+        effect_Unit_Sprite.image = image_OriginId;
         KillUnit(effect_Unit, cp);
     }
     if (Plague_GroupControl & 2)
     {
+        //W-Q-Q이레딧
         cunit.setloc(tempLoc);
         const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 12);
         const tcunit = CUnit(epd);
         tcunit.orderTarget = cunit;
         tcunit.orderID = 10;
     }
+    if (Plague_GroupControl & 4)
+    {
+        //하수인 공&이속 업
+        cunit.set_speed_upgrade();
+    }
+    if (Plague_GroupControl & 8)
+    {
+        //하수인 공&이속 업 끝
+        cunit.clear_speed_upgrade();
+    }
+    if (Plague_GroupControl & 16)
+    {
+        //하수인 분열!
+        if (minion_Cur < minion_Limit)
+        {
+            cunit.setloc(tempLoc);
+            const curHp = cunit.hp;
+            RemoveUnitAt(1, plague_Minion_Unit, tempLoc, cp);
+            //거점 할당 삭제
+            if (type < 4)
+            {
+                FOB_Count[type] -= 1;
+            }
+            for (var i = 0; i < 2; i++) {
+                const epd = sy.Unit_Create(cp, plague_Minion_Unit, bufferLoc, tempLoc);
+                const tcunit = CUnit(epd);
+                tcunit.hp = curHp/2;
+                tcunit.unknown0x86 = 4;
+                tcunit.unknown0x8C = 0;
+                if (!Plague_FOB_alloc_ary(tcunit, type)) {
+                    Plague_MinionGroup_Main.add(tcunit);
+                }
+            }
+            //이펙트
+            sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+            KillUnit(effect_Unit, cp);
+            minion_Cur += 2;
+            return true;
+        }
+    }
+    if (Plague_GroupControl & 512)
+    {
+        //하수인 3배 분열!
+        if (minion_Cur < minion_Limit-1)
+        {
+            cunit.setloc(tempLoc);
+            const curHp = cunit.hp;
+            RemoveUnitAt(1, plague_Minion_Unit, tempLoc, cp);
+            //거점 할당 삭제
+            if (type < 4)
+            {
+                FOB_Count[type] -= 1;
+            }
+            for (var i = 0; i < 3; i++) {
+                const epd = sy.Unit_Create(cp, plague_Minion_Unit, bufferLoc, tempLoc);
+                const tcunit = CUnit(epd);
+                tcunit.hp = curHp/3;
+                tcunit.unknown0x86 = 4;
+                tcunit.unknown0x8C = 0;
+                if (!Plague_FOB_alloc_ary(tcunit, type)) {
+                    Plague_MinionGroup_Main.add(tcunit);
+                }
+            }
+            //이펙트
+            sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+            KillUnit(effect_Unit, cp);
+            minion_Cur += 3;
+            return true;
+        }
+    }
+    if (Plague_GroupControl & 32)
+    {
+        //하수인 회복
+        cunit.setloc(tempLoc);
+        const image_OriginId = effect_Unit_Sprite.image;
+        effect_Unit_Sprite.image = sc.image_Bengal;
+        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+        KillUnit(effect_Unit, cp);
+        sy.Unit_Healing_Percent(cunit, cp, 100);
+    }
+    if (Plague_GroupControl & 64)
+    {
+        //하수인 회복
+        sy.Unit_Healing_Percent(cunit, cp, 100);
+    }
+    if (cunit.irradiateTimer > 0 && Plague_tempHeal)
+    {
+        const timer = sy.GetExtraDb(cunit, 3);
+        if (timer == 0)
+        {
+            sy.Unit_Healing_Percent(cunit, cp, 4);
+            sy.SetExtraDb(cunit, 3, 24);
+        } else {
+            sy.ExtraSubDb(cunit, 3, 1);
+        }
+    }
+    return false;
 }
-
 function Plague_UnitGroup(cp, minion_order) {
     foreach (unit : Plague_SkillGroup.cploop) {
         foreach (dead : unit.dying) {
@@ -485,56 +840,142 @@ function Plague_UnitGroup(cp, minion_order) {
             //계속 날라가기 + 럴커생성
             if (timer == 0)
             {
-                cunit.unknown0x8C = 12;
-                const angle = sy.GetExtraDb(cunit, 1);
-                const dx, dy = lengthdir(120, angle);
-                const x, y = cunit.posX, cunit.posY;
-                setloc(tempLoc, x, y);
-                setloc(minionLoc, x + dx, y + dy);
-                Order(skill_Unit_1, cp, tempLoc, Move, minionLoc);
                 //스킬 유닛 생성
                 if (sy.GetExtraDb(cunit, 2) > 0)
                 {
+                    cunit.unknown0x8C = 12;
+                    const angle = sy.GetExtraDb(cunit, 1);
+                    const dx, dy = lengthdir(120, angle);
+                    const x, y = cunit.posX, cunit.posY;
+                    setloc(tempLoc, x, y);
+                    setloc(minionLoc, x + dx, y + dy);
+                    Order(skill_Unit_1, cp, tempLoc, Move, minionLoc);
+                    //따로
                     sy.ExtraSubDb(cunit, 2, 1);
                     sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, tempLoc, 0, 1);
                     //이펙트 유닛
                     sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
                     KillUnit(effect_Unit, cp);
                     temp_Count += 1;
+                } else {
+                    cunit.setloc(tempLoc);
+                    Order(skill_Unit_1, cp, tempLoc, Move, tempLoc);
                 }
             } else {
                 cunit.unknown0x8C -= 1;
             }
+            sy.ExtraSubDb(cunit, 1, 2);
         }
-
-        const Rtimer = sy.GetExtraDb(cunit, 1);
-        if (Rtimer == 0)
+        else if (type == 2)
         {
-            cunit.orderID = 0;
-        } else {
-            sy.ExtraSubDb(cunit, 1, 1);
+            //이레딧 시간 끝나면 죽기
+            if (cunit.irradiateTimer == 1) {
+                cunit.orderID = 0;
+                plague_Curruption_Count -= 1;
+            }
+        }
+        if (cunit.unitID == skill_Unit_1)
+        {
+            if (Plague_SkillControl & 1)
+            {
+                //3개로 분열하기
+                cunit.setloc(tempLoc);
+                RemoveUnitAt(1, skill_Unit_1, tempLoc, cp);
+                const angle = rand()%120;
+                for (var j = 0; j < 3; j++) {
+                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, tempLoc);
+                    bwrite_epd(epd + 0x84/4, 2, 1);
+                    wwrite_epd(epd + 0x8C/4, 0, 0);
+                    sy.SetExtraDb(epd, 0, 5);
+                    sy.SetExtraDb(epd, 1, angle + j*120); //이동 각도
+                    sy.SetExtraDb(epd, 2, 4); //생성 최대치
+                    Plague_SkillGroup.add(epd);
+                }
+            }
+            if (Plague_SkillControl & 2)
+            {
+                //4개로 분열하기
+                cunit.setloc(tempLoc);
+                RemoveUnitAt(1, skill_Unit_1, tempLoc, cp);
+                const angle = rand()%90;
+                for (var j = 0; j < 4; j++) {
+                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, tempLoc);
+                    bwrite_epd(epd + 0x84/4, 2, 1);
+                    wwrite_epd(epd + 0x8C/4, 0, 0);
+                    sy.SetExtraDb(epd, 0, 5);
+                    sy.SetExtraDb(epd, 1, angle + j*90); //이동 각도
+                    sy.SetExtraDb(epd, 2, 4); //생성 최대치
+                    Plague_SkillGroup.add(epd);
+                }
+            }
+        }
+        if (cunit.unitID == plague_Curruption)
+        {
+            if (Plague_SkillControl & 4)
+            {
+                //3개로 분열하기
+                cunit.setloc(tempLoc);
+                // RemoveUnitAt(1, plague_Curruption, tempLoc, cp);
+                const angle = rand()%120;
+                for (var j = 0; j < 3; j++) {
+                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, tempLoc);
+                    bwrite_epd(epd + 0x84/4, 2, 1);
+                    wwrite_epd(epd + 0x8C/4, 0, 0);
+                    sy.SetExtraDb(epd, 0, 5);
+                    sy.SetExtraDb(epd, 1, angle + j*120); //이동 각도
+                    sy.SetExtraDb(epd, 2, 5); //생성 최대치
+                    Plague_SkillGroup.add(epd);
+                }
+            }
+            if (Plague_SkillControl & 8)
+            {
+                //4개로 분열하기
+                cunit.setloc(tempLoc);
+                // RemoveUnitAt(1, plague_Curruption, tempLoc, cp);
+                const angle = rand()%90;
+                for (var j = 0; j < 4; j++) {
+                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, tempLoc);
+                    bwrite_epd(epd + 0x84/4, 2, 1);
+                    wwrite_epd(epd + 0x8C/4, 0, 0);
+                    sy.SetExtraDb(epd, 0, 5);
+                    sy.SetExtraDb(epd, 1, angle + j*90); //이동 각도
+                    sy.SetExtraDb(epd, 2, 5); //생성 최대치
+                    Plague_SkillGroup.add(epd);
+                }
+            }
         }
     }
     //minion_order : 1: 집결, 2: 거점, 4: 생성(800min)
     if (minion_order & 4)
     {
+        if (Command(cp, AtLeast, minion_Limit, plague_Minion_Unit))
+        {
+            printAllAt(6, "\x04하수인 소환 실패 \x02(\x04최대치 제한!\x02)");
+            return;
+        }
         if (Accumulate(cp, AtLeast, minion_Cost, Ore)) //미네랄확인
         {
             //텍스트 출력
             const x, y = getlocTL(heroLoc);
+            var image_OriginId = effect_Unit_Sprite.image;
             effect_Unit_Sprite.image = sc.image_Queen;
             //하수인 생성
             const epd = sy.Unit_Create(cp, plague_Minion_Unit, bufferLoc, heroLoc);
             //이펙트 유닛 생성
             sy.Unit_Create(cp, effect_Unit, bufferLoc, heroLoc);
             KillUnit(effect_Unit, cp);
-            sc.Reset_Change(effect_Unit_Sprite);
+            effect_Unit_Sprite.image = image_OriginId;
             if (epd > 0)
             {
                 //자원 감소
                 SetResources(cp, Subtract, minion_Cost, Ore);
                 printAllAt(6, "\x04하수인 소환 성공 \x02(\x08-\x07{}\x03Gold\x02)", minion_Cost);
                 Plague_MinionGroup_Main.add(epd);
+                minion_Cur += 1;
+                if (toogle_Minion_Upgrade)
+                {
+                    SetMemoryXEPD(epd + 0xDC/4, SetTo, 0x10000000, 0x10000000);
+                }
             } else {
                 //유닛제한으로 생성 실패
                 printAllAt(6, "\x04하수인 소환 실패 \x02(\x04유닛 제한 오류!\x02)");
@@ -560,6 +1001,7 @@ function Plague_UnitGroup(cp, minion_order) {
     }
     foreach (unit : Plague_MinionGroup_Main.cploop) {
         foreach (dead : unit.dying) {
+            minion_Cur -= 1;
             sy.ExtraDb_Reset(dead.epd);
         }
         const cunit = CUnit(unit.epd);
@@ -651,10 +1093,25 @@ function Plague_UnitGroup(cp, minion_order) {
                 cunit.set_collision();
             }
         }
-        Plague_SkillControl(cp, cunit);
+        else if (type == 4)
+        {
+            //분열 후 거점에 들어갈지 영웅에 모일지 계산
+            //거점 유닛 할당시키기
+            if (Plague_FOB_alloc(cunit)) unit.remove();
+            //할당 안된 유닛은 영웅으로 모이기
+            cunit.unknown0x86 = 3;
+            cunit.unknown0x8C = 0;
+        }
+        if (Plague_MinionSkill(cp, cunit, 4))
+        {
+            minion_Cur -= 1;
+            sy.ExtraDb_Reset(cunit);
+            unit.remove();
+        }
     }
     foreach (unit : Plague_MinionGroup_FOB_1.cploop) {
         foreach (dead : unit.dying) {
+            minion_Cur -= 1;
             sy.ExtraDb_Reset(dead.epd);
         }
         const cunit = CUnit(unit.epd);
@@ -716,9 +1173,16 @@ function Plague_UnitGroup(cp, minion_order) {
                 cunit.set_collision();
             }
         }
+        if (Plague_MinionSkill(cp, cunit, 0))
+        {
+            minion_Cur -= 1;
+            sy.ExtraDb_Reset(cunit);
+            unit.remove();
+        }
     }
     foreach (unit : Plague_MinionGroup_FOB_2.cploop) {
         foreach (dead : unit.dying) {
+            minion_Cur -= 1;
             sy.ExtraDb_Reset(dead.epd);
         }
         const cunit = CUnit(unit.epd);
@@ -780,9 +1244,16 @@ function Plague_UnitGroup(cp, minion_order) {
                 cunit.set_collision();
             }
         }
+        if (Plague_MinionSkill(cp, cunit, 1))
+        {
+            minion_Cur -= 1;
+            sy.ExtraDb_Reset(cunit);
+            unit.remove();
+        }
     }
     foreach (unit : Plague_MinionGroup_FOB_3.cploop) {
         foreach (dead : unit.dying) {
+            minion_Cur -= 1;
             sy.ExtraDb_Reset(dead.epd);
         }
         const cunit = CUnit(unit.epd);
@@ -844,8 +1315,15 @@ function Plague_UnitGroup(cp, minion_order) {
                 cunit.set_collision();
             }
         }
+        if (Plague_MinionSkill(cp, cunit, 2))
+        {
+            minion_Cur -= 1;
+            sy.ExtraDb_Reset(cunit);
+            unit.remove();
+        }
     }
     Plague_GroupControl = 0;
+    Plague_SkillControl = 0;
 }
 
 function Plague_FOB_Remove(cp, index) {

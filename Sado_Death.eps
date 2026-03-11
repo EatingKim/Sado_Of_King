@@ -13,6 +13,7 @@ const Death_MinionGroup_FOB_2 = UnitGroup(500);
 const Death_MinionGroup_FOB_3 = UnitGroup(500);
 var minion_Cost = 800;
 var minion_Limit = 36;
+var minion_Cur = 0;
 const FOB_Count = EUDArray(3);
 const FOB_Exist = EUDArray(3);
 const FOB_Epd = EUDArray(3);
@@ -535,7 +536,7 @@ function Death_Skill(cp, epd, type, timer, max) {
                 KillUnit(effect_Unit, cp);
             }
             const amount = 50*256/24;
-            sy.Unit_Healing_Count(epd, cp, amount);
+            sy.Unit_Healing_Count(CUnit(epd), cp, amount);
             break;
         case 7: //W-W
             if (timer%2 == 0 && timer < 64)
@@ -997,7 +998,7 @@ function Death_Skill_Enhance(cp, epd, type, timer, max) {
                 KillUnit(effect_Unit, cp);
             }
             const amount = 50*256/24;
-            sy.Unit_Healing_Count(epd, cp, amount);
+            sy.Unit_Healing_Count(CUnit(epd), cp, amount);
             //하수인 회복 부분은 나중에
             break;
         case 7: //W-W
@@ -1258,7 +1259,7 @@ function Death_UnitGroup(cp, minion_order) {
     //minion_order : 1: 집결, 2: 거점, 4: 생성(800min)
     if (minion_order & 4)
     {
-        if (Command(cp, AtLeast, minion_Limit, death_Minion_Unit))
+        if (minion_Cur >= minion_Limit)
         {
             printAllAt(6, "\x04하수인 소환 실패 \x02(\x04최대치 제한!\x02)");
             return;
@@ -1281,6 +1282,7 @@ function Death_UnitGroup(cp, minion_order) {
                 printAllAt(6, "\x04하수인 소환 성공 \x02(\x08-\x07{}\x03Gold\x02)", minion_Cost);
                 Death_MinionGroup_Main.add(epd);
                 sy.SetExtraDb(epd, 0, 5);
+                minion_Cur += 1;
             } else {
                 //유닛제한으로 생성 실패
                 printAllAt(6, "\x04하수인 소환 실패 \x02(\x04유닛 제한 오류!\x02)");
@@ -1307,6 +1309,7 @@ function Death_UnitGroup(cp, minion_order) {
     }
     foreach (unit : Death_MinionGroup_Main.cploop) {
         foreach (dead : unit.dying) {
+            minion_Cur -= 1;
             sy.ExtraDb_Reset(dead.epd);
         }
         const cunit = CUnit(unit.epd);
@@ -1401,6 +1404,7 @@ function Death_UnitGroup(cp, minion_order) {
     }
     foreach (unit : Death_MinionGroup_FOB_1.cploop) {
         foreach (dead : unit.dying) {
+            minion_Cur -= 1;
             sy.ExtraDb_Reset(dead.epd);
         }
         const cunit = CUnit(unit.epd);
@@ -1465,6 +1469,7 @@ function Death_UnitGroup(cp, minion_order) {
     }
     foreach (unit : Death_MinionGroup_FOB_2.cploop) {
         foreach (dead : unit.dying) {
+            minion_Cur -= 1;
             sy.ExtraDb_Reset(dead.epd);
         }
         const cunit = CUnit(unit.epd);
@@ -1529,6 +1534,7 @@ function Death_UnitGroup(cp, minion_order) {
     }
     foreach (unit : Death_MinionGroup_FOB_3.cploop) {
         foreach (dead : unit.dying) {
+            minion_Cur -= 1;
             sy.ExtraDb_Reset(dead.epd);
         }
         const cunit = CUnit(unit.epd);

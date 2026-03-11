@@ -37,29 +37,29 @@ const death_canCombo_Enhance =
                         NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO];
 //역병의 사도
 const plague_Maxtime = [0, 
-                       (5+1)*12, (3+1)*12, 9, (4+2)*12, 
-                       9, 25*24, 25*24, 25*24, 
-                       8, 36, 
-                       130, 
+                       (5+1)*12, (4+1)*12, 9, (4+2)*12, 
+                       6, 6, 6, (5+2)*12, 
+                       8, 25*24, 
+                       15*24, 
                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const plague_Maxtime_Enhance = [0, 
-                       (5+1)*12, (4+1)*12, (3+1)*12, 9, 
-                       9, 25*24, 25*24, 25*24, 
-                       8, 36, 
-                       130, 
+                       (6+1)*12, (4+1)*12, 9, (4+2)*12, 
+                       6, 6, 6, (5+2)*12, 
+                       8, 25*24, 
+                       25*24, 
                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const plague_canCombo = [NOCOMBO, //시작점
                         YESCOMBO, YESCOMBO, NOCOMBO, NOCOMBO, //Q
-                        YESCOMBO, 9, 9, 9, //W
+                        YESCOMBO, YESCOMBO, NOCOMBO, NOCOMBO, //W
                         YESCOMBO, NOCOMBO,             //E
-                        NOCOMBO,                   //R
+                        9,                   //R
                         NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO];
 const plague_canCombo_Enhance = 
                        [NOCOMBO, //시작점
                         YESCOMBO, YESCOMBO, NOCOMBO, NOCOMBO, //Q
-                        YESCOMBO, 9, NOCOMBO, NOCOMBO, //W
+                        YESCOMBO, YESCOMBO, NOCOMBO, NOCOMBO, //W
                         YESCOMBO, NOCOMBO,             //E
-                        NOCOMBO,                   //R
+                        9,                   //R
                         NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO];
 
 object Skill_Info {
@@ -241,20 +241,20 @@ object Sado {
                         this.curSkillCombo = 6;
                         cond = true;
                     }
-                    else if (Num == 2)
-                    {
-                        //W-W스킬 발동
-                        this.curSkillCombo = 8;
-                        cond = true;
-                    }
                 }
                 else if (combo == 6)
                 {
                     //W-Q스킬 발동 시
                     if (Num == 1)
                     {
-                        //W-Q스킬 발동
+                        //W-Q-Q스킬 발동
                         this.curSkillCombo = 7;
+                        cond = true;
+                    }
+                    else if (Num == 2)
+                    {
+                        //W-Q-W스킬 발동
+                        this.curSkillCombo = 8;
                         cond = true;
                     }
                 }
@@ -326,7 +326,17 @@ object Sado {
         const info = Skill_Info.cast(this.info[type_]);
         if (info.isEnhance) return false; //이미 강화된 상태라면 패스
         info.isEnhance = true;
-        info.maxtime = death_Maxtime_Enhance[type_];
+        switch (this.type) {
+            case 1:
+                info.maxtime = death_Maxtime_Enhance[type_];
+                break;
+            case 2:
+                info.maxtime = plague_Maxtime_Enhance[type_];
+                break;
+        
+            default:
+                break;
+        }
         return true;
     }
     function Skill_Remove(cp) {

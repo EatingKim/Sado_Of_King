@@ -189,51 +189,57 @@ function LocationDistance(loc1, loc2) {
     return Hypot(x1-x2, y1-y2);
 }
 
-function Unit_Healing_Count(epd, cp, amount) {
+function Unit_Healing_Count(cunit: CUnit, cp, amount) {
     //음수 양수 모두 가능
-    const unitId = wread_epd(epd + 0x64/4, 0);
+    const unitId = cunit.unitID;
     const unit = TrgUnit(unitId);
     const maxHp = unit.maxHp;
-    const curHp = dwread_epd(epd + 0x08/4);
+    const curHp = cunit.hp;
     if (amount > 0x80000000)
     {
         if (curHp < amount)
         {
-            dwwrite_epd(epd + 0x08/4, 0);
-            bwrite_epd(epd + 0x4C/4, 1, 0); //사망명령
+            //사망명령
+            cunit.orderID = 0;
+            cunit.hp = 0;
+        }
+        else 
+        {
+            cunit.hp -= amount;
         }
     }
     else 
     {
         if (curHp + amount < maxHp)
         {
-            dwadd_epd(epd + 0x08/4, amount);
+            cunit.hp += amount;
         }
         else
         {
-            dwwrite_epd(epd + 0x08/4, maxHp);
+            cunit.hp = maxHp;
         }
     }
 }
 
-function Unit_Healing_Percent(epd, cp, per) {
+function Unit_Healing_Percent(cunit: CUnit, cp, per) {
     //-100~100%
-    const unitId = wread_epd(epd + 0x64/4, 0);
+    const unitId = cunit.unitID;
     const unit = TrgUnit(unitId);
     const maxHp = unit.maxHp;
-    const curHp = dwread_epd(epd + 0x08/4);
+    const curHp = cunit.hp;
     if (per > 0x80000000)
     { //음수 경우에는 체력 감소
+        per = -per;
         const amount = maxHp * per / 100;
-        if (curHp - amount > 0)
+        if (curHp > amount)
         {
-            dwsubtract_epd(epd + 0x08/4, amount);
+            cunit.hp -= amount;
         }
         else
         { 
             //사망명령
-            bwrite_epd(epd + 0x4C/4, 1, 0);
-            dwwrite_epd(epd + 0x08/4, 0);
+            cunit.orderID = 0;
+            cunit.hp = 0;
         }
     }
     else
@@ -241,11 +247,11 @@ function Unit_Healing_Percent(epd, cp, per) {
         const amount = maxHp * per / 100;
         if (curHp + amount < maxHp)
         {
-            dwadd_epd(epd + 0x08/4, amount);
+            cunit.hp += amount;
         }
         else
         {
-            dwwrite_epd(epd + 0x08/4, maxHp);
+            cunit.hp = maxHp;
         }
     }
 }

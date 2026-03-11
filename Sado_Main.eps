@@ -99,7 +99,7 @@ function Sado_SKill(cp) {
             }
         }
     }
-    printAllAt(8, "콤보 타이머: {} 콤보: {}", sado.comboTimer, sado.curSkillCombo);
+    // printAllAt(8, "콤보 타이머: {} 콤보: {}", sado.comboTimer, sado.curSkillCombo);
     if (sado.comboTimer > 0 && sado.comboTimer <= 20)
     {
         sado.comboTimer -= 1;
@@ -117,7 +117,7 @@ function init() {
         sado_Main[i] = sdo.Sado.alloc();
     }
     const temp = sy.SetNextUnitEPD();
-    CreateUnit(1, 36, "Anywhere", P2);
+    CreateUnit(1, 42, "Anywhere", P2);
     const sado_Death = sdo.Sado.cast(sado_Main[0]);
     {
         const epd = sy.SetNextUnitEPD();
@@ -162,20 +162,21 @@ function Hero_InputCheck(cp, input) {
     const sado = sdo.Sado.cast(sado_Main[cp]);
     if (epd == sado.epd) //영웅
     {
+        const cunit = CUnit(epd);
         for (var i = 0; i < 4; i++) {
-            if (TE.BuildCheckEPD(epd, skillList_Unit[i]))
+            if (TE.BuildCheckEPD(cunit, skillList_Unit[i]))
             {
-                TE.BuildResetEPD(epd);
+                TE.BuildResetEPD(cunit);
                 sado.skillList[skillList_Index[cp]] = i + 1;
                 if (skillList_Index[cp] < 29) skillList_Index[cp] += 1;
                 else skillList_Index[cp] = 0;
             }
         }
-        if (TE.BuildCheckEPD(epd, 41)) //힐링
+        if (TE.BuildCheckEPD(cunit, 41)) //힐링
         {
             //큐에 들어가지 않고 바로 실행
-            TE.BuildResetEPD(epd);
-            sy.Unit_Healing_Percent(epd, cp, 100);
+            TE.BuildResetEPD(cunit);
+            sy.Unit_Healing_Percent(cunit, cp, 100);
         }
         //하수인 명령은 키 입력으로 대체
         //1: 하수인 집결, 2: 하수인 거점 4: 하수인 생성(800미네랄)

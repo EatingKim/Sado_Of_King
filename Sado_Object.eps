@@ -1,5 +1,6 @@
 import PluginVariables as msqcvar;
 import Sado_Plague as sdp;
+import Sado_Extirpation as sde;
 
 import System as sy;
 import ArrayPool as ap;
@@ -55,6 +56,32 @@ const plague_canCombo = [NOCOMBO, //시작점
                         9,                   //R
                         NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO];
 const plague_canCombo_Enhance = 
+                       [NOCOMBO, //시작점
+                        YESCOMBO, YESCOMBO, NOCOMBO, NOCOMBO, //Q
+                        YESCOMBO, YESCOMBO, NOCOMBO, NOCOMBO, //W
+                        YESCOMBO, NOCOMBO,             //E
+                        9,                   //R
+                        NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO];
+//파괴의 사도
+const extip_Maxtime = [0, 
+                       9, 20, 25, 25, 
+                       38, 12, 38, 38, 
+                       8, 25*24, 
+                       15*24, 
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const extip_Maxtime_Enhance = [0, 
+                       (6+1)*12, (4+1)*12, 9, (4+2)*12, 
+                       6, 6, 6, (5+2)*12, 
+                       8, 25*24, 
+                       25*24, 
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const extip_canCombo = [NOCOMBO, //시작점
+                        YESCOMBO, YESCOMBO, NOCOMBO, NOCOMBO, //Q
+                        YESCOMBO, NOCOMBO, YESCOMBO, NOCOMBO, //W
+                        YESCOMBO, NOCOMBO,             //E
+                        9,                   //R
+                        NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO, NOCOMBO];
+const extip_canCombo_Enhance = 
                        [NOCOMBO, //시작점
                         YESCOMBO, YESCOMBO, NOCOMBO, NOCOMBO, //Q
                         YESCOMBO, YESCOMBO, NOCOMBO, NOCOMBO, //W
@@ -269,6 +296,88 @@ object Sado {
                     }
                 }
                 break;
+            case 3: //파괴
+                if (combo == 0)
+                {
+                    //스킬 미발동 시
+                    if (Num == 1) 
+                    {
+                        //Q스킬 발동
+                        this.curSkillCombo = 1;
+                        cond = true;
+                    }
+                    else if (Num == 2) 
+                    {
+                        //W스킬 발동
+                        this.curSkillCombo = 5;
+                        cond = true;
+                    }
+                    else if (Num == 3)
+                    {
+                        //E스킬 발동
+                        this.curSkillCombo = 9;
+                        cond = true;
+                    }
+                    else if (Num == 4)
+                    {
+                        //R스킬 발동
+                        this.curSkillCombo = 11;
+                        cond = true;
+                    }
+                }
+                else if (combo == 1)
+                {
+                    //Q스킬 발동 시
+                    if (Num == 1)
+                    {
+                        //Q-Q스킬 발동
+                        this.curSkillCombo = 2;
+                        cond = true;
+                    }
+                    else if (Num == 3)
+                    {
+                        //Q-Q-W스킬 발동
+                        this.curSkillCombo = 4;
+                        cond = true;
+                    }
+                }
+                else if (combo == 2)
+                {
+                    //Q-Q스킬 발동 시
+                    if (Num == 1)
+                    {
+                        //Q-Q-Q스킬 발동
+                        this.curSkillCombo = 3;
+                        cond = true;
+                    }
+                }
+                else if (combo == 5)
+                {
+                    //W스킬 발동 시
+                    if (Num == 1)
+                    {
+                        //W-Q스킬 발동
+                        this.curSkillCombo = 6;
+                        cond = true;
+                    }
+                    else if (Num == 2)
+                    {
+                        //W-W스킬 발동
+                        this.curSkillCombo = 7;
+                        cond = true;
+                    }
+                }
+                else if (combo == 7)
+                {
+                    //W-W스킬 발동 시
+                    if (Num == 2)
+                    {
+                        //W-W-W스킬 발동
+                        this.curSkillCombo = 8;
+                        cond = true;
+                    }
+                }
+                break;
         
             default:
                 break;
@@ -286,6 +395,9 @@ object Sado {
                 case 2:
                     this.comboTimer = plague_canCombo_Enhance[combo];
                     break;
+                case 3:
+                    this.comboTimer = extip_canCombo_Enhance[combo];
+                    break;
             
                 default:
                     break;
@@ -299,6 +411,9 @@ object Sado {
                     break;
                 case 2:
                     this.comboTimer = plague_canCombo[combo];
+                    break;
+                case 3:
+                    this.comboTimer = extip_canCombo[combo];
                     break;
             
                 default:
@@ -333,6 +448,9 @@ object Sado {
             case 2:
                 info.maxtime = plague_Maxtime_Enhance[type_];
                 break;
+            case 3:
+                info.maxtime = extip_Maxtime_Enhance[type_];
+                break;
         
             default:
                 break;
@@ -346,6 +464,9 @@ object Sado {
                 break;
             case 2: //역병
                 sdp.Plague_SkillRemove(cp, this.curSkillCombo);
+                break;
+            case 3: //파괴
+                sde.Extip_SkillRemove(cp, this.curSkillCombo);
                 break;
         
             default:
@@ -368,6 +489,14 @@ function Skill_Info_init(sado: Sado) {
                 const info = Skill_Info.cast(sado.info[i]);
                 info.type = i;
                 info.maxtime = plague_Maxtime[i];
+                info.isEnhance = false;
+            }
+            break;
+        case 3: //파괴
+            for (var i = 0; i < ap.size; i++) {
+                const info = Skill_Info.cast(sado.info[i]);
+                info.type = i;
+                info.maxtime = extip_Maxtime[i];
                 info.isEnhance = false;
             }
             break;

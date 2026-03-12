@@ -2,6 +2,7 @@ import PluginVariables as msqcvar;
 import Sado_Object as sdo;
 import Sado_Death as sdd;
 import Sado_Plague as sdp;
+import Sado_Extirpation as sde;
 import Sado_DiagramData as dd;
 import TriggerEditor.TETools as TE;
 import System as sy;
@@ -123,7 +124,7 @@ function init() {
         const epd = sy.SetNextUnitEPD();
         CreateUnit(1, 0, "Anywhere", P1);
         SetMemoryXEPD(epd + 0xDC/4, SetTo, 0x900000, 0x900000);
-        sado_Death.type = 2;
+        sado_Death.type = 3;
         sado_Death.epd = epd;
         sado_Death.isAlive = true;
         sdo.Skill_Info_init(sado_Death);
@@ -150,6 +151,10 @@ function Hero_Play(cp) {
         case 2:
             sdp.Plague_Skill_Main(cp, sado_Main);
             sdp.Plague_UnitGroup(cp, sado.group_Order);
+            break;
+        case 3:
+            sde.Extip_Skill_Main(cp, sado_Main);
+            sde.Extip_UnitGroup(cp, sado.group_Order);
             break;
     
         default:

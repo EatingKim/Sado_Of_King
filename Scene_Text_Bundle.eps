@@ -1,0 +1,38 @@
+
+
+
+
+//index: 0
+const text_index_0_Scene_Title = [Db("\n"),
+                                  Db("\n"),
+                                  Db("\x13\x03================================================"),
+                                  Db("\n"),
+                                  Db("\n"),
+                                  Db("\n"),
+                                  Db("\n"),
+                                  Db("\n"),
+                                  Db("\x13\x03================================================"),
+                                  Db("\n"),
+                                  Db("\n")];
+const text_index_1_Scene_Title = [Db("\n"),
+                                  Db("\n"),
+                                  Db("\x13\x04================================================"),
+                                  Db("\n"),
+                                  Db("\n"),
+                                  Db("\n"),
+                                  Db("\n"),
+                                  Db("\n"),
+                                  Db("\x13\x04================================================"),
+                                  Db("\n"),
+                                  Db("\n")];
+
+function Get_Str(index, line) {
+    switch (index) {
+        case 0:
+            return text_index_0_Scene_Title[line];
+        case 1:
+            return text_index_1_Scene_Title[line];
+        default:
+            return Db("");
+    }
+}

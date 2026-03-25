@@ -6,17 +6,18 @@ import ArrayPool as ap;
 import ScData as sc;
 import TriggerEditor.TETools as TE;
 import Enemy as ey;
+import Scenario as scn;
 
 var PColorNum = 0;
 const KeyInput = PVariable();
 const s = StringBuffer(1024);
 var targetepd;
-function DPS_Update(targetepd, maxHp);
 function onPluginStart() {
 
     randomize();
     ap.init();
     sc.init();
+    scn.init();
     targetepd = sd.init();
     EUDRegisterObjectToNamespace("Key", KeyInput); //키인식 배열
     SetResources(P1, SetTo, 50000, OreAndGas);
@@ -31,96 +32,10 @@ function beforeTriggerExec() {
     }
     ey.TestSummon(P2);
 }
-var recoverTimer = 0;
-var LastHp = 90000;
-var totalDamage = 0;
-var combatFrame = 0;
-var idleFrame = 0;
-var isCombat = 0;
-var DPS = 0;
 function afterTriggerExec() {
 
-    s.insert(0);
-    s.appendf("\x02현재체력: \x04{}\n", dwread_epd(targetepd + 0x08/4)/256);
-    
-    DPS_Update(targetepd, 90000);
-    s.appendf("\x02초당 피해량: \x04{}\n", DPS);
-    s.appendf("\x02누적 피해량: \x04{}\n", totalDamage);
-    s.appendf("\x02비전투시간: \x04{} (3초 누적시 피해량 초기화)", idleFrame);
-    s.DisplayAt(2);
-}
-
-function DPS_Update(targetepd, maxHp)
-{
-    if (recoverTimer == 0)
-    {
-        recoverTimer = 24;
-
-        const curHp = dwread_epd(targetepd + 0x08/4) / 256;
-        var damageThisSec = 0;
-
-        if (LastHp > curHp)
-            damageThisSec = LastHp - curHp;
-
-        // =========================
-        // 피해 발생
-        // =========================
-        if (damageThisSec > 0)
-        {
-            if (isCombat == 0)
-            {
-                isCombat = 1;
-                totalDamage = 0;
-                DPS = 0;
-                combatFrame = 0;
-                idleFrame = 0;
-            }
-
-            totalDamage += damageThisSec;
-            DPS = damageThisSec;   // 최근 1초 DPS
-            idleFrame = 0;
-        }
-        else
-        {
-            if (isCombat == 1)
-                idleFrame += 1;
-        }
-
-        // =========================
-        // 전투 시간 증가
-        // =========================
-        if (isCombat == 1)
-            combatFrame += 1;
-
-        // =========================
-        // 3초 비전투 → 전투 종료
-        // =========================
-        if (isCombat == 1 && idleFrame >= 3)
-        {
-            var avgDPS = 0;
-
-            if (combatFrame > 0)
-                avgDPS = totalDamage / combatFrame;
-
-            printAllAt(6, "전투 종료");
-
-            // 🔥 여기서 체력 회복
-            dwwrite_epd(targetepd + 0x08/4, maxHp * 256);
-            LastHp = maxHp;
-
-            // 상태 초기화
-            isCombat = 0;
-            idleFrame = 0;
-            combatFrame = 0;
-        }
-        else
-        {
-            // 전투 중에는 현재 체력 기준으로만 갱신
-            LastHp = curHp;
-        }
-    }
-    else
-    {
-        recoverTimer -= 1;
+     scn.GamePlay_MainStream();
+	foreach (cp : EUDLoopPlayer("Human")) {
+        scn.GamePlay_SoloStream(cp);
     }
 }

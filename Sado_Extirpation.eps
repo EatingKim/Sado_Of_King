@@ -18,15 +18,16 @@ const FOB_Count = EUDArray(3);
 const FOB_Exist = EUDArray(3);
 const FOB_Epd = EUDArray(3);
 var Extip_GroupControl = 0;
+var Extip_SkillControl = 0;
 
-const targetLoc = $L("Target");
 const bufferLoc = $L("Buffer");
-const searchLoc = $L("Skill_Range");
-const tempLoc = $L("Temp");
-const minionLoc = $L("Minion");
-const heroLoc = $L("Hero");
+const targetLoc_F = $L("Target_F_Extip");
+const targetLoc_S = $L("Target_S_Extip");
+const searchLoc = $L("Search_Extip");
+const minionLoc = $L("Minion_Extip");
+const heroLoc = $L("Hero_Extip");
 const centerLoc = $L("Anywhere");
-const mouseLoc = $L("Location 23");
+const mouseLoc = $L("Location 1");
 const hero_Unit = TrgUnit(0);
 const skill_Unit_1 = TrgUnit(27);
 const skill_Unit_1_Sprite = Sprite(303);
@@ -183,7 +184,7 @@ function Extip_UnitSetting(cp, type, isEnhance) {
             skill_Unit_1_Weapon_Sprite.image = sc.image_ASCHit;
             skill_Unit_1_Weapon.maxRange = 10*32;
             skill_Unit_1_Weapon.behavior = sc.behavior_Instant;
-            skill_Unit_1_Weapon.explosionType = sc.explosion_Basic;
+            skill_Unit_1_Weapon.explosionType = sc.explosion_Cluster;
             skill_Unit_1_Weapon.splashInnerRadius = 18;
             skill_Unit_1_Weapon.splashMiddleRadius = 24;
             skill_Unit_1_Weapon.splashOuterRadius = 48;
@@ -200,7 +201,7 @@ function Extip_UnitSetting(cp, type, isEnhance) {
             skill_Unit_1_Weapon_Sprite.image = sc.image_ASCHit;
             skill_Unit_1_Weapon.maxRange = 10*32;
             skill_Unit_1_Weapon.behavior = sc.behavior_Instant;
-            skill_Unit_1_Weapon.explosionType = sc.explosion_Basic;
+            skill_Unit_1_Weapon.explosionType = sc.explosion_Cluster;
             skill_Unit_1_Weapon.splashInnerRadius = 18;
             skill_Unit_1_Weapon.splashMiddleRadius = 24;
             skill_Unit_1_Weapon.splashOuterRadius = 48;
@@ -217,7 +218,7 @@ function Extip_UnitSetting(cp, type, isEnhance) {
             skill_Unit_1_Weapon_Sprite.image = sc.image_ASCHit;
             skill_Unit_1_Weapon.maxRange = 10*32;
             skill_Unit_1_Weapon.behavior = sc.behavior_Instant;
-            skill_Unit_1_Weapon.explosionType = sc.explosion_Basic;
+            skill_Unit_1_Weapon.explosionType = sc.explosion_Cluster;
             skill_Unit_1_Weapon.splashInnerRadius = 18;
             skill_Unit_1_Weapon.splashMiddleRadius = 24;
             skill_Unit_1_Weapon.splashOuterRadius = 48;
@@ -226,58 +227,93 @@ function Extip_UnitSetting(cp, type, isEnhance) {
             effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
             break;
         case 9:
-            skill_Unit_1.seekRange = 10;
-            skill_Unit_1_Sprite.image = sc.image_TTurret;
-            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
-            skill_Unit_1_Weapon.damage = 27;
-            skill_Unit_1_Weapon.damageBonus = 4;
-            skill_Unit_1_Weapon_Sprite.image = sc.image_ASCHit;
-            skill_Unit_1_Weapon.maxRange = 10*32;
+            skill_Unit_1.seekRange = 0;
+            skill_Unit_1_Sprite.image = sc.image_Vessel;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Black;
+            skill_Unit_1_Weapon.damage = 0;
+            skill_Unit_1_Weapon.damageBonus = 0;
+            skill_Unit_1_Weapon_Sprite.image = sc.image_GRHit;
+            skill_Unit_1_Weapon.maxRange = 0*32;
             skill_Unit_1_Weapon.behavior = sc.behavior_Instant;
             skill_Unit_1_Weapon.explosionType = sc.explosion_Basic;
-            skill_Unit_1_Weapon.splashInnerRadius = 18;
-            skill_Unit_1_Weapon.splashMiddleRadius = 24;
-            skill_Unit_1_Weapon.splashOuterRadius = 48;
+            skill_Unit_1_Weapon.splashInnerRadius = 0;
+            skill_Unit_1_Weapon.splashMiddleRadius = 0;
+            skill_Unit_1_Weapon.splashOuterRadius = 0;
 
-            effect_Unit_Sprite.image = sc.image_Vessel;
+            skill_Unit_2.seekRange = 7;
+            skill_Unit_2_Sprite.image = sc.image_GTurret;
+            skill_Unit_2_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_2_Weapon.damage = 25;
+            skill_Unit_2_Weapon.damageBonus = 4;
+            skill_Unit_2_Weapon_Sprite.image = sc.image_GRHit;
+            skill_Unit_2_Weapon.maxRange = 7*32;
+            skill_Unit_2_Weapon.behavior = sc.behavior_Instant;
+            skill_Unit_2_Weapon.explosionType = sc.explosion_Basic;
+            skill_Unit_2_Weapon.splashInnerRadius = 0;
+            skill_Unit_2_Weapon.splashMiddleRadius = 0;
+            skill_Unit_2_Weapon.splashOuterRadius = 0;
+
+            effect_Unit_Sprite.image = sc.image_Archon;
             effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
             break;
         case 10:
-            skill_Unit_1.seekRange = 10;
-            skill_Unit_1_Sprite.image = sc.image_Mutal;
-            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
-            skill_Unit_1_Weapon.damage = 27;
-            skill_Unit_1_Weapon.damageBonus = 5;
-            skill_Unit_1_Weapon_Sprite.image = sc.image_Venom;
-            skill_Unit_1_Weapon.maxRange = 10*32;
-            skill_Unit_1_Weapon.behavior = sc.behavior_Targetunit;
+            skill_Unit_1.seekRange = 0;
+            skill_Unit_1_Sprite.image = sc.image_Vessel;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Black;
+            skill_Unit_1_Weapon.damage = 0;
+            skill_Unit_1_Weapon.damageBonus = 0;
+            skill_Unit_1_Weapon_Sprite.image = sc.image_GRHit;
+            skill_Unit_1_Weapon.maxRange = 0*32;
+            skill_Unit_1_Weapon.behavior = sc.behavior_Instant;
             skill_Unit_1_Weapon.explosionType = sc.explosion_Basic;
             skill_Unit_1_Weapon.splashInnerRadius = 0;
             skill_Unit_1_Weapon.splashMiddleRadius = 0;
             skill_Unit_1_Weapon.splashOuterRadius = 0;
 
-            effect_Unit_Sprite.image = sc.image_DarkA;
+            skill_Unit_2.seekRange = 7;
+            skill_Unit_2_Sprite.image = sc.image_GTurret;
+            skill_Unit_2_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_2_Weapon.damage = 25;
+            skill_Unit_2_Weapon.damageBonus = 4;
+            skill_Unit_2_Weapon_Sprite.image = sc.image_GRHit;
+            skill_Unit_2_Weapon.maxRange = 7*32;
+            skill_Unit_2_Weapon.behavior = sc.behavior_Instant;
+            skill_Unit_2_Weapon.explosionType = sc.explosion_Basic;
+            skill_Unit_2_Weapon.splashInnerRadius = 0;
+            skill_Unit_2_Weapon.splashMiddleRadius = 0;
+            skill_Unit_2_Weapon.splashOuterRadius = 0;
+
+            effect_Unit_Sprite.image = sc.image_DarkT;
             effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
             break;
         case 11:
-            skill_Unit_1.seekRange = 10;
-            skill_Unit_1_Sprite.image = sc.image_Mutal;
-            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Origin;
-            skill_Unit_1_Weapon.damage = 27;
-            skill_Unit_1_Weapon.damageBonus = 5;
-            skill_Unit_1_Weapon_Sprite.image = sc.image_Venom;
-            skill_Unit_1_Weapon.maxRange = 10*32;
-            skill_Unit_1_Weapon.behavior = sc.behavior_Targetunit;
+            skill_Unit_1.seekRange = 0;
+            skill_Unit_1_Sprite.image = sc.image_Vessel;
+            skill_Unit_1_Sprite.image.drawingFunction = sc.drawing_Black;
+            skill_Unit_1_Weapon.damage = 0;
+            skill_Unit_1_Weapon.damageBonus = 0;
+            skill_Unit_1_Weapon_Sprite.image = sc.image_GRHit;
+            skill_Unit_1_Weapon.maxRange = 0*32;
+            skill_Unit_1_Weapon.behavior = sc.behavior_Instant;
             skill_Unit_1_Weapon.explosionType = sc.explosion_Basic;
             skill_Unit_1_Weapon.splashInnerRadius = 0;
             skill_Unit_1_Weapon.splashMiddleRadius = 0;
             skill_Unit_1_Weapon.splashOuterRadius = 0;
 
-            skill_Unit_2.buildingDimensions = 65537;
-            skill_Unit_2_Sprite.image = sc.image_DarkA;
+            skill_Unit_2.seekRange = 12;
+            skill_Unit_2_Sprite.image = sc.image_TTurret;
             skill_Unit_2_Sprite.image.drawingFunction = sc.drawing_Origin;
+            skill_Unit_2_Weapon.damage = 30;
+            skill_Unit_2_Weapon.damageBonus = 6;
+            skill_Unit_2_Weapon_Sprite.image = sc.image_ASCHit;
+            skill_Unit_2_Weapon.maxRange = 12*32;
+            skill_Unit_2_Weapon.behavior = sc.behavior_Instant;
+            skill_Unit_2_Weapon.explosionType = sc.explosion_Cluster;
+            skill_Unit_2_Weapon.splashInnerRadius = 18;
+            skill_Unit_2_Weapon.splashMiddleRadius = 24;
+            skill_Unit_2_Weapon.splashOuterRadius = 48;
 
-            effect_Unit_Sprite.image = sc.image_Devour;
+            effect_Unit_Sprite.image = sc.image_Kakaru;
             effect_Unit_Sprite.image.drawingFunction = sc.drawing_Origin;
             break;
     
@@ -294,29 +330,29 @@ function Extip_Skill(cp, epd, type, timer, max) {
             if (timer == 0)
             {
                 const x, y = getlocTL(heroLoc);
-                setloc(targetLoc, x, y);
+                setloc(targetLoc_F, x, y);
                 sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, heroLoc, 5);
                 sy.Unit_Create(cp, effect_Unit, bufferLoc, heroLoc);
                 KillUnit(effect_Unit, cp);
             }
             if (timer == 3) {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 for (var i = 0; i < 8; i++) {
                     const dx, dy = dd.shape_Square_3[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 5);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 5);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                     KillUnit(effect_Unit, cp);
                 }
             }
             if (timer == 6)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 for (var i = 0; i < 16; i++) {
                     const dx, dy = dd.shape_Square_5[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 5);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 5);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                     KillUnit(effect_Unit, cp);
                 }
             }
@@ -346,9 +382,9 @@ function Extip_Skill(cp, epd, type, timer, max) {
                         default:
                             break;
                     }
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 5);
-                    sy.Unit_Create_Sudden(cp, skill_Unit_2, bufferLoc, tempLoc, 5);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 5);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_2, bufferLoc, targetLoc_S, 5);
                 }
             }
             break;
@@ -356,17 +392,17 @@ function Extip_Skill(cp, epd, type, timer, max) {
             if (timer == 0)
             {
                 const x, y = getlocTL(heroLoc);
-                setloc(targetLoc, x, y);
+                setloc(targetLoc_F, x, y);
             }
             if (timer%4 == 0 && timer < 20)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 for (var i = 0; i < 5; i++) {
                     const index = (timer/3 + i)%5;
                     const dx, dy = dd.shape_Line_5[index];
-                    setloc(tempLoc, x + dx, y + dy + (i-2)*48);
-                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    setloc(targetLoc_S, x + dx, y + dy + (i-2)*48);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 4);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                 }
                 KillUnit(effect_Unit, cp);
             }
@@ -374,12 +410,12 @@ function Extip_Skill(cp, epd, type, timer, max) {
         case 4: //Q-E
             if (timer == 0)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 for (var i = 0; i < 32; i++) {
                     const dx, dy = dd.shape_Square_9[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 6);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 6);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                 }
                 KillUnit(effect_Unit, cp);
             }
@@ -388,12 +424,12 @@ function Extip_Skill(cp, epd, type, timer, max) {
             if (timer == 0)
             {
                 const x, y = getlocTL(heroLoc);
-                setloc(targetLoc, x, y);
+                setloc(targetLoc_F, x, y);
                 for (var i = 0; i < 16; i++) {
-                    const dx, dy = dd.shape_Circle_256[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                    sy.Unit_Create(cp, skill_Unit_1, bufferLoc, tempLoc);
+                    const dx, dy = dd.shape_Circle_192[i];
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                    sy.Unit_Create(cp, skill_Unit_1, bufferLoc, targetLoc_S);
                 }
                 KillUnit(effect_Unit, cp);
             }
@@ -438,18 +474,18 @@ function Extip_Skill(cp, epd, type, timer, max) {
         case 7: //W-W
             if (timer == 0)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 TE.SetPColor(Ncp, color_White);
                 for (var i = 0; i < 16; i++) {
-                    const dx, dy = dd.shape_Circle_128[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                    sy.Unit_Create(cp, skill_Unit_1, bufferLoc, tempLoc);
+                    const dx, dy = dd.shape_Circle_160[i];
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                    sy.Unit_Create(cp, skill_Unit_1, bufferLoc, targetLoc_S);
                 }
                 for (var i = 0; i < 16; i++) {
-                    const dx, dy = dd.shape_Circle_256[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    const dx, dy = dd.shape_Circle_192[i];
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                 }
                 KillUnit(effect_Unit, cp);
             }
@@ -457,23 +493,23 @@ function Extip_Skill(cp, epd, type, timer, max) {
         case 8: //W-W-W
             if (timer == 0)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 TE.SetPColor(Ncp, color_White);
                 for (var i = 0; i < 16; i++) {
-                    const dx, dy = dd.shape_Circle_96[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                    sy.Unit_Create(cp, skill_Unit_1, bufferLoc, tempLoc);
-                }
-                for (var i = 0; i < 16; i++) {
-                    const dx, dy = dd.shape_Circle_256[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                }
-                for (var i = 0; i < 16; i++) {
                     const dx, dy = dd.shape_Circle_128[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                    sy.Unit_Create(cp, skill_Unit_1, bufferLoc, targetLoc_S);
+                }
+                for (var i = 0; i < 16; i++) {
+                    const dx, dy = dd.shape_Circle_160[i];
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                }
+                for (var i = 0; i < 16; i++) {
+                    const dx, dy = dd.shape_Circle_192[i];
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                 }
                 KillUnit(effect_Unit, cp);
             }
@@ -483,130 +519,55 @@ function Extip_Skill(cp, epd, type, timer, max) {
             }
             break;
         case 9: //E
-            if (timer%5 == 0 && timer < 12)
-            {
-                const x, y = posread_epd(epd + 0x28/4);
-                setloc(searchLoc, x, y);
-                dilateloc(searchLoc, 160, 160);
-                RemoveUnit(0, P12);
-                MoveLocation(targetLoc, "Men", NonAlliedVictoryPlayers, searchLoc);
-                const tx, ty = getlocTL(targetLoc);
-                sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc, 4);
-                TE.SetPColor(Ncp, array_ColorLine_Dark[timer/5]);
-                for (var i = 0; i < 8; i++) {
-                    const dx, dy = dd.shape_Square_3[i];
-                    setloc(tempLoc, tx + dx, ty + dy);
-                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
-                    TE.SetUnitColorEPD(epd, Ncp);
-                }
-                for (var i = 0; i < 16; i++) {
-                    const dx, dy = dd.shape_Square_5[i];
-                    setloc(tempLoc, tx + dx, ty + dy);
-                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
-                    TE.SetUnitColorEPD(epd, Ncp);
-                }
-            }
-            break;
-        case 10: //E-E
-            if (timer < 30) 
-            {
-                if (timer%2 == 0)
-                {
-                    const x, y = getlocTL(targetLoc);
-                    const temp = (timer/2)%4;
-                    TE.SetPColor(Ncp, array_ColorLine_Dark[(timer/5)%8]);
-                    for (var i = 1; i < 4; i++) {
-                        setloc(tempLoc, x + dd.shape_Straight_dy[temp]*i, y + dd.shape_Straight_dy[temp]*i);
-                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
-                        TE.SetUnitColorEPD(epd, Ncp);
-                    }
-                    KillUnit(effect_Unit, cp);
-                }
-                if (timer%2 == 1)
-                {
-                    const x, y = getlocTL(targetLoc);
-                    const temp = (timer-1)/2%4;
-                    for (var i = 1; i < 4; i++) {
-                        setloc(tempLoc, x + dd.shape_Cross_dx[temp]*i, y + dd.shape_Cross_dy[temp]*i);
-                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
-                        TE.SetUnitColorEPD(epd, Ncp);
-                    }
-                    KillUnit(effect_Unit, cp);
-                }
-            }
-            break;
-        case 11: //R
             if (timer == 0)
             {
-                const x, y = getlocTL(heroLoc);
-                setloc(targetLoc, x, y);
                 for (var i = 0; i < 4; i++) {
-                    acc_Square[i] = 0;
+                    for (var j = 0; j < 5; j++) {
+                        const x, y = getlocTL(heroLoc);
+                        const dx, dy = dd.shape_Cross_dx[i], dd.shape_Cross_dy[i];
+                        setloc(targetLoc_S, x + dx*j, y + dy*j);
+                        const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, targetLoc_S);
+                        Extip_SkillGroup.add(epd);
+                        const cunit = CUnit(epd);
+                        cunit.unknown0x86 = 1;
+                        cunit.unknown0x8C = 0;
+                        cunit.set_invincible();
+                        sy.SetExtraDb(cunit, 0, 5);
+                        sy.SetExtraDb(cunit, 1, 7);
+                        sy.SetExtraDb(cunit, 2, rand()%360);
+                    }
                 }
             }
-            if (timer < 120)
+            break;
+        case 10: //E-Q
+            if (timer < 30) 
             {
-                const x, y = getlocTL(targetLoc);
-                // --- [0] 16개 점 그룹 (Size 4) ---
-                acc_Square[0] += 16;
-                if (acc_Square[0] >= 80) {
-                    acc_Square[0] -= 80;
-                    pos_Square[0] = (pos_Square[0] + 1) % 16; // 한 칸 전진
-                    
-                    for (var i = 0; i < 4; i++) {
-                        const index = (pos_Square[0] + i * 4) % 16; // 4칸 간격으로 4개 생성
-                        const dx, dy = dd.shape_Square_5[index];
-                        setloc(tempLoc, x + dx, y + dy);
-                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
-                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
-                    }
-                    KillUnit(skill_Unit_2, cp);
-                }
-
-                // --- [1] 24개 점 그룹 (Size 6) ---
-                acc_Square[1] += 24;
-                if (acc_Square[1] >= 80) {
-                    acc_Square[1] -= 80;
-                    pos_Square[1] = (pos_Square[1] + 1) % 24; // 한 칸 전진
-
-                    for (var i = 0; i < 4; i++) {
-                        const index = (pos_Square[1] + i * 6) % 24; // 6칸 간격으로 4개 생성
-                        const dx, dy = dd.shape_Square_7[index];
-                        setloc(tempLoc, x + dx, y + dy);
-                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
-                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
-                    }
-                    KillUnit(skill_Unit_2, cp);
-                }
-
-                // --- [2] 32개 점 그룹 (Size 8) ---
-                acc_Square[2] += 32;
-                if (acc_Square[2] >= 80) {
-                    acc_Square[2] -= 80;
-                    pos_Square[2] = (pos_Square[2] + 1) % 32; // 한 칸 전진
-
-                    for (var i = 0; i < 4; i++) {
-                        const index = (pos_Square[2] + i * 8) % 32; // 8칸 간격으로 4개 생성
-                        const dx, dy = dd.shape_Square_9[index];
-                        setloc(tempLoc, x + dx, y + dy);
-                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
-                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
-                    }
-                    KillUnit(skill_Unit_2, cp);
-                }
-                if (timer%16 == 0)
+                if (timer%3 == 0)
                 {
-                    const x, y = getlocTL(targetLoc);
-                    for (var i = 0; i < 8; i++) {
-                        const dx, dy = dd.shape_Square_3[i];
-                        setloc(tempLoc, x + dx, y + dy);
-                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                    }
-                    KillUnit(effect_Unit, cp);
+                    Extip_SkillControl += 1;
                 }
             }
+            if (timer == max)
+            {
+                KillUnit(skill_Unit_1, cp);
+                KillUnit(skill_Unit_2, cp);
+            }
+            break;
+        case 11: //E-E
+            if (timer == 0)
+            {
+                Extip_SkillControl += 2;
+            }
+            if (timer == 90)
+            {
+                Extip_SkillControl += 4;
+            }
+            if (timer == max)
+            {
+                KillUnit(skill_Unit_2, cp);
+            }
+            break;
+        case 12: //R
             break;
     
         default:
@@ -630,31 +591,31 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                 setloc(searchLoc, x, y);
                 dilateloc(searchLoc, 196, 196);
                 RemoveUnit(0, P12);
-                MoveLocation(targetLoc, "Men", NonAlliedVictoryPlayers, searchLoc);
-                TE.AttackGround(searchLoc, targetLoc, skill_Unit_2, dummyUnit, cp);
+                MoveLocation(targetLoc_F, "Men", NonAlliedVictoryPlayers, searchLoc);
+                TE.AttackGround(searchLoc, targetLoc_F, skill_Unit_2, dummyUnit, cp);
             }
             else if (timer == 4) {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 for (var i = 0; i < 4; i++) {
                     for (var j = 1; j < 4; j++) {
-                        setloc(tempLoc, x + dd.shape_Cross_dx[i]*j, y + dd.shape_Cross_dy[i]*j);
-                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                        setloc(targetLoc_S, x + dd.shape_Cross_dx[i]*j, y + dd.shape_Cross_dy[i]*j);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                     }
                 }
             }
             else if (timer == 6)
             {
                 RemoveUnit(effect_Unit, cp);
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 TE.SetPColor(Ncp, color_Black);
                 for (var i = 0; i < 4; i++) {
                     for (var j = 1; j < 4; j++) {
-                        setloc(tempLoc, x + dd.shape_Cross_dx[i]*j, y + dd.shape_Cross_dy[i]*j);
-                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                        setloc(targetLoc_S, x + dd.shape_Cross_dx[i]*j, y + dd.shape_Cross_dy[i]*j);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 3);
                         TE.SetUnitColorEPD(epd, Ncp);
                     }
-                    setloc(tempLoc, x + dd.shape_Straight_dy[i], y + dd.shape_Straight_dy[i]);
-                    const epd_2 = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    setloc(targetLoc_S, x + dd.shape_Straight_dy[i], y + dd.shape_Straight_dy[i]);
+                    const epd_2 = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 3);
                     TE.SetUnitColorEPD(epd_2, Ncp);
                 }
             }
@@ -662,44 +623,44 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
         case 2: //Q-Q
             if (timer == 0 || timer == 8)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 for (var i = 0; i < 4; i++) {
                     for (var j = 1; j < 4; j++) {
-                        setloc(tempLoc, x + dd.shape_Cross_dx[i]*j, y + dd.shape_Cross_dy[i]*j);
-                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                        setloc(targetLoc_S, x + dd.shape_Cross_dx[i]*j, y + dd.shape_Cross_dy[i]*j);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                     }
                 }
             }
             else if (timer == 2 || timer == 10)
             {
                 RemoveUnit(effect_Unit, cp);
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 for (var i = 0; i < 4; i++) {
                     for (var j = 1; j < 4; j++) {
-                        setloc(tempLoc, x + dd.shape_Cross_dx[i]*j, y + dd.shape_Cross_dy[i]*j);
-                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                        setloc(targetLoc_S, x + dd.shape_Cross_dx[i]*j, y + dd.shape_Cross_dy[i]*j);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 3);
                         Unit_Color_Change(cp, epd, color_ArmyD);
                     }
                 }
             }
             else if (timer == 4)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 for (var i = 0; i < 4; i++) {
                     for (var j = 1; j < 4; j++) {
-                        setloc(tempLoc, x + dd.shape_Straight_dy[i]*j, y + dd.shape_Straight_dy[i]*j);
-                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                        setloc(targetLoc_S, x + dd.shape_Straight_dy[i]*j, y + dd.shape_Straight_dy[i]*j);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                     }
                 }
             }
             else if (timer == 6)
             {
                 RemoveUnit(effect_Unit, cp);
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 for (var i = 0; i < 4; i++) {
                     for (var j = 1; j < 4; j++) {
-                        setloc(tempLoc, x + dd.shape_Straight_dy[i]*j, y + dd.shape_Straight_dy[i]*j);
-                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                        setloc(targetLoc_S, x + dd.shape_Straight_dy[i]*j, y + dd.shape_Straight_dy[i]*j);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 3);
                         Unit_Color_Change(cp, epd, color_ArmyD);
                     }
                 }
@@ -708,28 +669,28 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
         case 3: //Q-W
             if (timer == 2)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 for (var i = 0; i < 8; i++) {
                     const dx, dy = dd.shape_Circle_64[i*2];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                 }
             }
             else if (timer == 4)
             {
                 KillUnit(effect_Unit, cp);
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 for (var i = 0; i < 4; i++) {
                     for (var j = 1; j < 3; j++) {
-                        setloc(tempLoc, x + dd.shape_Straight_dy[i]*j, y + dd.shape_Straight_dy[i]*j);
-                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                        setloc(targetLoc_S, x + dd.shape_Straight_dy[i]*j, y + dd.shape_Straight_dy[i]*j);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 3);
                         Unit_Color_Change(cp, epd, color_ArmyD);
                     }
                 }
                 for (var i = 0; i < 4; i++) {
                     for (var j = 1; j < 2; j++) {
-                        setloc(tempLoc, x + dd.shape_Straight_dy[i]*j, y + dd.shape_Straight_dy[i]*j);
-                        TE.AttackGround(tempLoc, tempLoc, skill_Unit_2, dummyUnit, cp);
+                        setloc(targetLoc_S, x + dd.shape_Straight_dy[i]*j, y + dd.shape_Straight_dy[i]*j);
+                        TE.AttackGround(targetLoc_S, targetLoc_S, skill_Unit_2, dummyUnit, cp);
                     }
                 }
             }
@@ -737,11 +698,11 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
         case 4: //Q-E
             if (timer == 0 || timer == 10 || timer == 20)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 for (var i = 0; i < 8; i++) {
                     const dx, dy = dd.shape_Circle_32[i*2];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                 }
             }
             if (timer == 2 || timer == 12 || timer == 22)
@@ -750,19 +711,19 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
             }
             if (timer == 3 || timer == 13 || timer == 23)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 const offset = (timer == 3 || timer == 23) ? 0 : 1;
                 TE.SetPColor(Ncp, color_ArmyF);
                 for (var i = 0; i < 8; i++) {
                     const dx, dy = dd.shape_Circle_32[i*2 + offset];
-                    setloc(tempLoc, x + dx, y + dy);
-                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 3);
                     TE.SetUnitColorEPD(epd, Ncp);
                 }
                 for (var i = 0; i < 8; i++) {
                     const dx, dy = dd.shape_Circle_64[i*2];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                 }
             }
             if (timer == 5 || timer == 15 || timer == 25)
@@ -771,19 +732,19 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
             }
             if (timer == 6 || timer == 16 || timer == 26)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 const offset = (timer == 6 || timer == 26) ? 1 : 0;
                 TE.SetPColor(Ncp, color_ArmyD);
                 for (var i = 0; i < 8; i++) {
                     const dx, dy = dd.shape_Circle_64[i*2+offset];
-                    setloc(tempLoc, x + dx, y + dy);
-                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 3);
                     TE.SetUnitColorEPD(epd, Ncp);
                 }
                 for (var i = 0; i < 8; i++) {
                     const dx, dy = dd.shape_Circle_96[i*2];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                 }
             }
             if (timer == 8 || timer == 18 || timer == 28)
@@ -792,13 +753,13 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
             }
             if (timer == 9 || timer == 19 || timer == 29)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
                 const offset = (timer == 9 || timer == 29) ? 0 : 1;
                 TE.SetPColor(Ncp, color_Black);
                 for (var i = 0; i < 8; i++) {
                     const dx, dy = dd.shape_Circle_96[i*2+offset];
-                    setloc(tempLoc, x + dx, y + dy);
-                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 3);
                     TE.SetUnitColorEPD(epd, Ncp);
                 }
             }
@@ -810,9 +771,9 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                 TE.SetPColor(Ncp, color_White);
                 for (var i = 0; i < 16; i++) {
                     const dx, dy = dd.shape_Circle_128[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 3);
                     TE.SetUnitColorEPD(epd, Ncp);
                 }
                 KillUnit(effect_Unit, cp);
@@ -823,9 +784,9 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                 TE.SetPColor(Ncp, color_Wine);
                 for (var i = 0; i < 16; i++) {
                     const dx, dy = dd.shape_Circle_96[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 3);
                     TE.SetUnitColorEPD(epd, Ncp);
                 }
                 KillUnit(effect_Unit, cp);
@@ -836,9 +797,9 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                 TE.SetPColor(Ncp, color_Yellow);
                 for (var i = 0; i < 16; i++) {
                     const dx, dy = dd.shape_Circle_64[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 3);
                     TE.SetUnitColorEPD(epd, Ncp);
                 }
                 KillUnit(effect_Unit, cp);
@@ -849,9 +810,9 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                 TE.SetPColor(Ncp, color_PeachD);
                 for (var i = 0; i < 16; i++) {
                     const dx, dy = dd.shape_Circle_32[i];
-                    setloc(tempLoc, x + dx, y + dy);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 3);
+                    setloc(targetLoc_S, x + dx, y + dy);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 3);
                     TE.SetUnitColorEPD(epd, Ncp);
                 }
                 KillUnit(effect_Unit, cp);
@@ -901,12 +862,12 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                 const x, y = getlocTL(heroLoc);
                 const tick = (timer/2)%16;
                 const dx, dy = dd.shape_Circle_32[tick];
-                setloc(tempLoc, x + dx, y + dy);
-                const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, sy.NONE);
+                setloc(targetLoc_S, x + dx, y + dy);
+                const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, sy.NONE);
                 Extip_SkillGroup.add(epd);
                 bwrite_epd(epd + 0x84/4, 2, 1); //행동타입
                 bwrite_epd(epd + 0x8C/4, 0, 4); //행동 타이머
-                sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                 KillUnit(effect_Unit, cp);
                 TE.SetUnitColorEPD(epd, Ncp);
             }
@@ -915,12 +876,12 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                 const x, y = getlocTL(heroLoc);
                 const tick = (timer/2)%16;
                 const dx, dy = dd.shape_Circle_64[tick];
-                setloc(tempLoc, x + dx, y + dy);
-                const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, sy.NONE);
+                setloc(targetLoc_S, x + dx, y + dy);
+                const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, sy.NONE);
                 Extip_SkillGroup.add(epd);
                 bwrite_epd(epd + 0x84/4, 2, 1); //행동타입
                 bwrite_epd(epd + 0x8C/4, 0, 4); //행동 타이머
-                sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                 KillUnit(effect_Unit, cp);
                 TE.SetUnitColorEPD(epd, Ncp);
             }
@@ -929,12 +890,12 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                 const x, y = getlocTL(heroLoc);
                 const tick = (timer/2)%16;
                 const dx, dy = dd.shape_Circle_96[tick];
-                setloc(tempLoc, x + dx, y + dy);
-                const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, sy.NONE);
+                setloc(targetLoc_S, x + dx, y + dy);
+                const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, sy.NONE);
                 Extip_SkillGroup.add(epd);
                 bwrite_epd(epd + 0x84/4, 2, 1); //행동타입
                 bwrite_epd(epd + 0x8C/4, 0, 4); //행동 타이머
-                sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                 KillUnit(effect_Unit, cp);
                 TE.SetUnitColorEPD(epd, Ncp);
             }
@@ -952,26 +913,26 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                 setloc(searchLoc, x, y);
                 dilateloc(searchLoc, 160, 160);
                 RemoveUnit(0, P12);
-                MoveLocation(targetLoc, "Men", NonAlliedVictoryPlayers, searchLoc);
-                const tx, ty = getlocTL(targetLoc);
-                sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc, 4);
+                MoveLocation(targetLoc_F, "Men", NonAlliedVictoryPlayers, searchLoc);
+                const tx, ty = getlocTL(targetLoc_F);
+                sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_F, 4);
                 TE.SetPColor(Ncp, array_ColorLine_Dark[timer/5]);
                 for (var i = 0; i < 8; i++) {
                     const dx, dy = dd.shape_Square_3[i];
-                    setloc(tempLoc, tx + dx, ty + dy);
-                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                    setloc(targetLoc_S, tx + dx, ty + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 4);
                     TE.SetUnitColorEPD(epd, Ncp);
                 }
                 for (var i = 0; i < 16; i++) {
                     const dx, dy = dd.shape_Square_5[i];
-                    setloc(tempLoc, tx + dx, ty + dy);
-                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                    setloc(targetLoc_S, tx + dx, ty + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 4);
                     TE.SetUnitColorEPD(epd, Ncp);
                 }
                 for (var i = 0; i < 24; i++) {
                     const dx, dy = dd.shape_Square_7[i];
-                    setloc(tempLoc, tx + dx, ty + dy);
-                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                    setloc(targetLoc_S, tx + dx, ty + dy);
+                    const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 4);
                     TE.SetUnitColorEPD(epd, Ncp);
                 }
             }
@@ -981,25 +942,25 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
             {
                 if (timer%2 == 0)
                 {
-                    const x, y = getlocTL(targetLoc);
+                    const x, y = getlocTL(targetLoc_F);
                     const temp = (timer/2)%4;
                     TE.SetPColor(Ncp, array_ColorLine_Dark[(timer/5)%8]);
                     for (var i = 1; i < 5; i++) {
-                        setloc(tempLoc, x + dd.shape_Straight_dy[temp]*i, y + dd.shape_Straight_dy[temp]*i);
-                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                        setloc(targetLoc_S, x + dd.shape_Straight_dy[temp]*i, y + dd.shape_Straight_dy[temp]*i);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 4);
                         TE.SetUnitColorEPD(epd, Ncp);
                     }
                     KillUnit(effect_Unit, cp);
                 }
                 if (timer%2 == 1)
                 {
-                    const x, y = getlocTL(targetLoc);
+                    const x, y = getlocTL(targetLoc_F);
                     const temp = (timer-1)/2%4;
                     for (var i = 1; i < 5; i++) {
-                        setloc(tempLoc, x + dd.shape_Cross_dx[temp]*i, y + dd.shape_Cross_dy[temp]*i);
-                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
-                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4);
+                        setloc(targetLoc_S, x + dd.shape_Cross_dx[temp]*i, y + dd.shape_Cross_dy[temp]*i);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 4);
                         TE.SetUnitColorEPD(epd, Ncp);
                     }
                     KillUnit(effect_Unit, cp);
@@ -1010,11 +971,11 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
             if (timer == 0)
             {
                 const x, y = getlocTL(heroLoc);
-                setloc(targetLoc, x, y);
+                setloc(targetLoc_F, x, y);
             }
             if (timer < 160)
             {
-                const x, y = getlocTL(targetLoc);
+                const x, y = getlocTL(targetLoc_F);
 
                 // --- [0] 16개 점 그룹 (Size 4) ---
                 acc_Square[0] += 16;
@@ -1025,9 +986,9 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                     for (var i = 0; i < 4; i++) {
                         const index = (pos_Square[0] + i * 4) % 16; // 4칸 간격으로 4개 생성
                         const dx, dy = dd.shape_Square_5[index];
-                        setloc(tempLoc, x + dx, y + dy);
-                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
-                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
+                        setloc(targetLoc_S, x + dx, y + dy);
+                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 4));
+                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, targetLoc_S);
                     }
                     KillUnit(skill_Unit_2, cp);
                 }
@@ -1041,9 +1002,9 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                     for (var i = 0; i < 4; i++) {
                         const index = (pos_Square[1] + i * 6) % 24; // 6칸 간격으로 4개 생성
                         const dx, dy = dd.shape_Square_7[index];
-                        setloc(tempLoc, x + dx, y + dy);
-                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
-                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
+                        setloc(targetLoc_S, x + dx, y + dy);
+                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 4));
+                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, targetLoc_S);
                     }
                     KillUnit(skill_Unit_2, cp);
                 }
@@ -1057,9 +1018,9 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                     for (var i = 0; i < 4; i++) {
                         const index = (pos_Square[2] + i * 8) % 32; // 8칸 간격으로 4개 생성
                         const dx, dy = dd.shape_Square_9[index];
-                        setloc(tempLoc, x + dx, y + dy);
-                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
-                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
+                        setloc(targetLoc_S, x + dx, y + dy);
+                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 4));
+                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, targetLoc_S);
                     }
                     KillUnit(skill_Unit_2, cp);
                 }
@@ -1073,19 +1034,19 @@ function Extip_Skill_Enhance(cp, epd, type, timer, max) {
                     for (var i = 0; i < 4; i++) {
                         const index = (pos_Square[3] + i * 10) % 40; // 8칸 간격으로 4개 생성
                         const dx, dy = dd.shape_Square_11[index];
-                        setloc(tempLoc, x + dx, y + dy);
-                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 4));
-                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, tempLoc);
+                        setloc(targetLoc_S, x + dx, y + dy);
+                        sy.Unit_RemoveEffect(sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 4));
+                        sy.Unit_Create(cp, skill_Unit_2, bufferLoc, targetLoc_S);
                     }
                     KillUnit(skill_Unit_2, cp);
                 }
                 if (timer%16 == 0)
                 {
-                    const x, y = getlocTL(targetLoc);
+                    const x, y = getlocTL(targetLoc_F);
                     for (var i = 0; i < 8; i++) {
                         const dx, dy = dd.shape_Square_3[i];
-                        setloc(tempLoc, x + dx, y + dy);
-                        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                        setloc(targetLoc_S, x + dx, y + dy);
+                        sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                     }
                     KillUnit(effect_Unit, cp);
                 }
@@ -1119,32 +1080,114 @@ function Extip_Skill_Main(cp, sado_Main: EUDArray) {
 function Extip_UnitGroup(cp, minion_order) {
     foreach (unit : Extip_SkillGroup.cploop) {
         foreach (dead : unit.dying) {
-            
+            sy.ExtraDb_Reset(dead.epd);
         }
         const cunit = CUnit(unit.epd);
         const type = cunit.unknown0x86;
         const timer = cunit.unknown0x8C;
         if (type == 1) 
         {
-            //W-W 공격후 모이기
+            //E 공격용 배슬
             if (timer == 0)
             {
-                cunit.unknown0x86 = 2;
-                cunit.unknown0x8C = 12;
-                unit.move_cp(0x28/4);
-                const x, y = cunit.posX, cunit.posY;
-                setloc(tempLoc, x, y);
-                Order(8, cp, tempLoc, Move, heroLoc);
+                if (sy.GetExtraDb(cunit, 1) > 0)
+                {
+                    cunit.unknown0x8C = 12;
+                    sy.ExtraSubDb(cunit, 1, 1);
+                    const x, y = cunit.posX, cunit.posY;
+                    const angle = (sy.GetExtraDb(cunit, 2)+rand()%180)%360;
+                    const dx, dy = lengthdir(128, angle);
+                    sy.SetExtraDb(cunit, 2, angle);
+                    //좌표이동
+                    setloc(targetLoc_S, x, y);
+                    setloc(minionLoc, x + dx, y + dy);
+                    Order(skill_Unit_1, cp, targetLoc_S, Move, minionLoc);
+                    //유닛공격
+                    sy.Unit_Create_Sudden(cp, skill_Unit_2, bufferLoc, targetLoc_S, 4);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                    KillUnit(effect_Unit, cp);
+                } else {
+                    cunit.unknown0x86 = 2;
+                    cunit.unknown0x8C = 0;
+                }
             } else {
                 cunit.unknown0x8C -= 1;
             }
         }
         else if (type == 2)
         {
-            //W-W모인 이후 사망
+            //E 끝나면 멈춤
             if (timer == 0)
             {
-                cunit.orderID = 0;
+                cunit.unknown0x8C = 3;
+                cunit.groundWeaponCooldown = 20;
+                cunit.orderID = 107;
+            } else {
+                cunit.unknown0x8C -= 1;
+            }
+            if (Extip_SkillControl & 1)
+            {
+                //골리앗 공격!
+                cunit.setloc(targetLoc_S);
+                sy.Unit_Create_Sudden(cp, skill_Unit_2, bufferLoc, targetLoc_S, 4);
+                sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                KillUnit(effect_Unit, cp);
+            }
+            if (Extip_SkillControl & 2)
+            {
+                //영웅에게 뭉치기!
+                cunit.setloc(targetLoc_S);
+                Order(skill_Unit_1, cp, targetLoc_S, Move, heroLoc);
+                cunit.unknown0x86 = 3;
+                cunit.unknown0x8C = 0;
+                sy.SetExtraDb(cunit, 1, 3);
+            }
+        }
+        else if (type == 3)
+        {
+            //영웅에게 뭉치기!
+            cunit.setloc(targetLoc_S);
+            Order(skill_Unit_1, cp, targetLoc_S, Move, heroLoc);
+            if (timer == 0)
+            {
+                if (sy.GetExtraDb(cunit, 1) > 0)
+                {
+                    sy.ExtraSubDb(cunit, 1, 1);
+                    cunit.unknown0x8C = 24;
+                    sy.Unit_Create(cp, skill_Unit_2, bufferLoc, targetLoc_S);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                    KillUnit(effect_Unit, cp);
+                }
+            } else {
+                cunit.unknown0x8C -= 1;
+            }
+            if (Extip_SkillControl & 4)
+            {
+                //무작위 방향으로 사출
+                cunit.unknown0x86 = 4;
+                cunit.unknown0x8C = 0;
+                cunit.orderID = 187;
+                cunit.orderState = 0;
+            }
+        }
+        else if (type == 4)
+        {
+            //무작위 방향으로 사출
+            if (timer == 0)
+            {
+                if (sy.GetExtraDb(cunit, 1) > 0)
+                {
+                    sy.ExtraSubDb(cunit, 1, 1);
+                    cunit.unknown0x8C = 24;
+                    cunit.setloc(targetLoc_S);
+                    sy.Unit_Create(cp, skill_Unit_2, bufferLoc, targetLoc_S);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
+                    KillUnit(effect_Unit, cp);
+                    //유닛이동
+                    cunit.orderID = 187;
+                } else {
+                    cunit.orderID = 0;
+                }
             } else {
                 cunit.unknown0x8C -= 1;
             }
@@ -1246,22 +1289,22 @@ function Extip_UnitGroup(cp, minion_order) {
             //마우스 위치에 집결
             const tx = sy.GetExtraDb(cunit, 1);
             const ty = sy.GetExtraDb(cunit, 2);
-            setloc(tempLoc, tx, ty);
+            setloc(targetLoc_S, tx, ty);
             cunit.setloc(minionLoc);
             //집결 명령 하달
             if (timer == 0)
             {
                 cunit.unknown0x8C = 24;
-                Order(Extip_Minion_Unit, cp, minionLoc, Move, tempLoc);
+                Order(Extip_Minion_Unit, cp, minionLoc, Move, targetLoc_S);
                 cunit.remove_collision();
             } else {
                 cunit.unknown0x8C -= 1;
             }
-            if (sy.LocationDistance(minionLoc, tempLoc) < 128)
+            if (sy.LocationDistance(minionLoc, targetLoc_S) < 128)
             {
                 cunit.unknown0x86 = 2;
                 cunit.unknown0x8C = 6;
-                Order(Extip_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                Order(Extip_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                 cunit.set_collision();
             }
         }
@@ -1319,19 +1362,19 @@ function Extip_UnitGroup(cp, minion_order) {
             {
                 //거점 위치랑 거리 비교
                 const tx, ty = posread_epd(FOB_Epd[0] + 0x28/4);
-                setloc(tempLoc, tx, ty);
+                setloc(targetLoc_S, tx, ty);
                 cunit.setloc(minionLoc);
-                if (sy.LocationDistance(minionLoc, tempLoc) > 160)
+                if (sy.LocationDistance(minionLoc, targetLoc_S) > 160)
                 {
                     //거점에서 멀어지면 강제 이동
                     cunit.unknown0x86 = 1;
                     cunit.unknown0x8C = 24;
-                    Order(Extip_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                    Order(Extip_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                     cunit.set_collision();
                 } else {
                     //거점 안이면 오더만 갱신
                     cunit.unknown0x8C = 24;
-                    Order(Extip_Minion_Unit, cp, minionLoc, Patrol, tempLoc);
+                    Order(Extip_Minion_Unit, cp, minionLoc, Patrol, targetLoc_S);
                 }
             } else {
                 cunit.unknown0x8C -= 1;
@@ -1341,22 +1384,22 @@ function Extip_UnitGroup(cp, minion_order) {
         {
             //거점 위치랑 너무 멀어지면 강제 이동
             const tx, ty = posread_epd(FOB_Epd[0] + 0x28/4);
-            setloc(tempLoc, tx, ty);
+            setloc(targetLoc_S, tx, ty);
             cunit.setloc(minionLoc);
             //집결 명령 하달
             if (timer == 0)
             {
                 cunit.unknown0x8C = 24;
-                Order(Extip_Minion_Unit, cp, minionLoc, Move, tempLoc);
+                Order(Extip_Minion_Unit, cp, minionLoc, Move, targetLoc_S);
                 cunit.remove_collision();
             } else {
                 cunit.unknown0x8C -= 1;
             }
-            if (sy.LocationDistance(minionLoc, tempLoc) < 160)
+            if (sy.LocationDistance(minionLoc, targetLoc_S) < 160)
             {
                 cunit.unknown0x86 = 0;
                 cunit.unknown0x8C = 24;
-                Order(Extip_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                Order(Extip_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                 cunit.set_collision();
             }
         }
@@ -1384,19 +1427,19 @@ function Extip_UnitGroup(cp, minion_order) {
             {
                 //거점 위치랑 거리 비교
                 const tx, ty = posread_epd(FOB_Epd[1] + 0x28/4);
-                setloc(tempLoc, tx, ty);
+                setloc(targetLoc_S, tx, ty);
                 cunit.setloc(minionLoc);
-                if (sy.LocationDistance(minionLoc, tempLoc) > 160)
+                if (sy.LocationDistance(minionLoc, targetLoc_S) > 160)
                 {
                     //거점에서 멀어지면 강제 이동
                     cunit.unknown0x86 = 1;
                     cunit.unknown0x8C = 24;
-                    Order(Extip_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                    Order(Extip_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                     cunit.set_collision();
                 } else {
                     //거점 안이면 오더만 갱신
                     cunit.unknown0x8C = 24;
-                    Order(Extip_Minion_Unit, cp, minionLoc, Patrol, tempLoc);
+                    Order(Extip_Minion_Unit, cp, minionLoc, Patrol, targetLoc_S);
                 }
             } else {
                 cunit.unknown0x8C -= 1;
@@ -1406,22 +1449,22 @@ function Extip_UnitGroup(cp, minion_order) {
         {
             //거점 위치랑 너무 멀어지면 강제 이동
             const tx, ty = posread_epd(FOB_Epd[1] + 0x28/4);
-            setloc(tempLoc, tx, ty);
+            setloc(targetLoc_S, tx, ty);
             cunit.setloc(minionLoc);
             //집결 명령 하달
             if (timer == 0)
             {
                 cunit.unknown0x8C = 24;
-                Order(Extip_Minion_Unit, cp, minionLoc, Move, tempLoc);
+                Order(Extip_Minion_Unit, cp, minionLoc, Move, targetLoc_S);
                 cunit.remove_collision();
             } else {
                 cunit.unknown0x8C -= 1;
             }
-            if (sy.LocationDistance(minionLoc, tempLoc) < 160)
+            if (sy.LocationDistance(minionLoc, targetLoc_S) < 160)
             {
                 cunit.unknown0x86 = 0;
                 cunit.unknown0x8C = 24;
-                Order(Extip_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                Order(Extip_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                 cunit.set_collision();
             }
         }
@@ -1449,19 +1492,19 @@ function Extip_UnitGroup(cp, minion_order) {
             {
                 //거점 위치랑 거리 비교
                 const tx, ty = posread_epd(FOB_Epd[2] + 0x28/4);
-                setloc(tempLoc, tx, ty);
+                setloc(targetLoc_S, tx, ty);
                 cunit.setloc(minionLoc);
-                if (sy.LocationDistance(minionLoc, tempLoc) > 160)
+                if (sy.LocationDistance(minionLoc, targetLoc_S) > 160)
                 {
                     //거점에서 멀어지면 강제 이동
                     cunit.unknown0x86 = 1;
                     cunit.unknown0x8C = 24;
-                    Order(Extip_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                    Order(Extip_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                     cunit.set_collision();
                 } else {
                     //거점 안이면 오더만 갱신
                     cunit.unknown0x8C = 24;
-                    Order(Extip_Minion_Unit, cp, minionLoc, Patrol, tempLoc);
+                    Order(Extip_Minion_Unit, cp, minionLoc, Patrol, targetLoc_S);
                 }
             } else {
                 cunit.unknown0x8C -= 1;
@@ -1471,26 +1514,28 @@ function Extip_UnitGroup(cp, minion_order) {
         {
             //거점 위치랑 너무 멀어지면 강제 이동
             const tx, ty = posread_epd(FOB_Epd[2] + 0x28/4);
-            setloc(tempLoc, tx, ty);
+            setloc(targetLoc_S, tx, ty);
             cunit.setloc(minionLoc);
             //집결 명령 하달
             if (timer == 0)
             {
                 cunit.unknown0x8C = 24;
-                Order(Extip_Minion_Unit, cp, minionLoc, Move, tempLoc);
+                Order(Extip_Minion_Unit, cp, minionLoc, Move, targetLoc_S);
                 cunit.remove_collision();
             } else {
                 cunit.unknown0x8C -= 1;
             }
-            if (sy.LocationDistance(minionLoc, tempLoc) < 160)
+            if (sy.LocationDistance(minionLoc, targetLoc_S) < 160)
             {
                 cunit.unknown0x86 = 0;
                 cunit.unknown0x8C = 24;
-                Order(Extip_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                Order(Extip_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                 cunit.set_collision();
             }
         }
     }
+    Extip_SkillControl = 0;
+    Extip_GroupControl = 0;
 }
 
 function Extip_FOB_Remove(cp, index) {
@@ -1508,6 +1553,11 @@ function Extip_SkillRemove(cp, combo) {
     else if (combo == 7)
     {
         //W-W
+        KillUnit(skill_Unit_1, cp);
+    }
+    else if (combo == 9)
+    {
+        //E
         KillUnit(skill_Unit_1, cp);
     }
 }

@@ -1,0 +1,115 @@
+
+import Scene_Text as st;
+import Scene_System as ss;
+import Sado_Main as sd;
+import ScData as sc;
+import Enemy as ey;
+
+function init() {
+    st.init();
+}
+
+
+var Game_Timer_Main = 0; //전체 시간 타이머
+const Game_Timer_Scene = EUDArray(6); //막 별로 타이머 배열
+var Game_Stage = 0; //현재 진행중인 막
+
+function GamePlay_MainStream() {
+    const timer = Game_Timer_Scene[Game_Stage];
+    if (Game_Stage == 0)
+    {
+        //1막 시작 전 
+        if (timer == 0)
+        {
+            //0막 설정
+            //선택 유닛 생성
+            //텍스트 출력
+            for (var cp = 0; cp < 4; cp++) {
+                if (playerexist(cp))
+                {
+                    for (var i = 0; i < 11; i++) {
+                        st.Text_Change(cp, 0, i);
+                    }
+                }
+            }
+            
+        }
+        else if (timer == 2)
+        {
+            for (var cp = 0; cp < 4; cp++) {
+                if (playerexist(cp))
+                {
+                    for (var i = 0; i < 11; i++) {
+                        st.Text_Change(cp, 1, i);
+                    }
+                }
+            }
+            st.Text_Print_AllPlayer();
+        }
+        else if (timer == 4)
+        {
+            for (var cp = 0; cp < 4; cp++) {
+                if (playerexist(cp))
+                {
+                    for (var i = 0; i < 11; i++) {
+                        st.Text_Change(cp, 2, i);
+                    }
+                }
+            }
+            st.Text_Print_AllPlayer();
+        }
+        else if (timer == 6)
+        {
+            for (var cp = 0; cp < 4; cp++) {
+                if (playerexist(cp))
+                {
+                    for (var i = 0; i < 11; i++) {
+                        st.Text_Change(cp, 3, i);
+                    }
+                }
+            }
+            st.Text_Print_AllPlayer();
+        }
+        else if (timer == 6)
+        {
+            for (var cp = 0; cp < 4; cp++) {
+                if (playerexist(cp))
+                {
+                    for (var i = 0; i < 11; i++) {
+                        st.Text_Change(cp, 4, i);
+                    }
+                }
+            }
+            st.Text_Print_AllPlayer();
+        }
+        else if (timer == 8)
+        {
+            for (var cp = 0; cp < 4; cp++) {
+                if (playerexist(cp))
+                {
+                    for (var i = 0; i < 11; i++) {
+                        st.Text_Change(cp, 5, i);
+                    }
+                }
+            }
+            st.Text_Print_AllPlayer();
+        }
+        else if (timer < 90)
+        {
+            st.Text_Print_AllPlayer();
+        }
+        else if (timer == 90)
+        {
+            
+        }
+    }
+    //텍스트 출력
+    //게임 타이머 진행
+    Game_Timer_Main += 1;
+    Game_Timer_Scene[Game_Stage] += 1;
+
+    
+}
+
+function GamePlay_SoloStream(cp) {
+}

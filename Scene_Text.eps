@@ -1,0 +1,101 @@
+
+import Scene_Text_Bundle as stb;
+
+
+const s_1 = StringBuffer(500);
+const s_2 = StringBuffer(500);
+const s_3 = StringBuffer(500);
+const s_4 = StringBuffer(500);
+const s_5 = StringBuffer(500);
+const s_6 = StringBuffer(500);
+const s_7 = StringBuffer(500);
+const s_8 = StringBuffer(500);
+const s_9 = StringBuffer(500);
+const s_10 = StringBuffer(500);
+const s_11 = StringBuffer(500);
+
+function init() {
+}
+
+function Text_Print_AllPlayer() {
+    for (var cp = 0; cp < 4; cp++) {
+        if (playerexist(cp))
+        {
+            setcurpl(cp);
+            s_1.DisplayAt(0);
+            s_2.DisplayAt(1);
+            s_3.DisplayAt(2);
+            s_4.DisplayAt(3);
+            s_5.DisplayAt(4);
+            s_6.DisplayAt(5);
+            s_7.DisplayAt(6);
+            s_8.DisplayAt(7);
+            s_9.DisplayAt(8);
+            s_10.DisplayAt(9);
+            s_11.DisplayAt(10);
+        }
+    }
+}
+function Text_Print_Player(cp) {
+    setcurpl(cp);
+    s_1.DisplayAt(0);
+    s_2.DisplayAt(1);
+    s_3.DisplayAt(2);
+    s_4.DisplayAt(3);
+    s_5.DisplayAt(4);
+    s_6.DisplayAt(5);
+    s_7.DisplayAt(6);
+    s_8.DisplayAt(7);
+    s_9.DisplayAt(8);
+    s_10.DisplayAt(9);
+    s_11.DisplayAt(10);
+}
+function Text_Change(cp, index, line) {
+    //텍스트 입력
+    const str = stb.Get_Str(index, line);
+    setcurpl(cp);
+    if (line == 0) {
+        s_1.insert(0);
+        s_1.appendf("{:s}", str);
+    }
+    else if (line == 1) {
+        s_2.insert(0);
+        s_2.appendf("{:s}", str);
+    }
+    else if (line == 2) {
+        s_3.insert(0);
+        s_3.appendf("{:s}", str);
+    }
+    else if (line == 3) {
+        s_4.insert(0);
+        s_4.appendf("{:s}", str);
+    }
+    else if (line == 4) {
+        s_5.insert(0);
+        s_5.appendf("{:s}", str);
+    }
+    else if (line == 5) {
+        s_6.insert(0);
+        s_6.appendf("{:s}", str);
+    }
+    else if (line == 6) {
+        s_7.insert(0);
+        s_7.appendf("{:s}", str);
+    }
+    else if (line == 7) {
+        s_8.insert(0);
+        s_8.appendf("{:s}", str);
+    }
+    else if (line == 8) {
+        s_9.insert(0);
+        s_9.appendf("{:s}", str);
+    }
+    else if (line == 9) {
+        s_10.insert(0);
+        s_10.appendf("{:s}", str);
+    }
+    else if (line == 10) {
+        s_11.insert(0);
+        s_11.appendf("{:s}", str);
+    }
+}

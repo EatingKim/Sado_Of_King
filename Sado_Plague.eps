@@ -23,14 +23,14 @@ var temp_Count = 0;
 var toogle_Minion_Upgrade = false;
 var Plague_tempHeal = 0;
 
-const targetLoc = $L("Target");
 const bufferLoc = $L("Buffer");
-const searchLoc = $L("Skill_Range");
-const tempLoc = $L("Temp");
-const minionLoc = $L("Minion");
-const heroLoc = $L("Hero");
+const targetLoc_F = $L("Target_F_Plague");
+const targetLoc_S = $L("Target_S_Plague");
+const searchLoc = $L("Search_Plague");
+const minionLoc = $L("Minion_Plague");
+const heroLoc = $L("Hero_Plague");
 const centerLoc = $L("Anywhere");
-const mouseLoc = $L("Location 23");
+const mouseLoc = $L("Location 1");
 const hero_Unit = TrgUnit(0);
 const skill_Unit_1 = TrgUnit(12);
 const skill_Unit_1_Sprite = Sprite(283);
@@ -321,8 +321,8 @@ function Plague_Skill(cp, epd, type, timer, max) {
             const x, y = getlocTL(heroLoc);
             setloc(searchLoc, x, y);
             dilateloc(searchLoc, 160, 160);
-            MoveLocation(targetLoc, "Men", NonAlliedVictoryPlayers, searchLoc);
-            Order(skill_Unit_1, cp, centerLoc, Move, targetLoc);
+            MoveLocation(targetLoc_F, "Men", NonAlliedVictoryPlayers, searchLoc);
+            Order(skill_Unit_1, cp, centerLoc, Move, targetLoc_F);
             if (timer == 0)
             {
                 temp_Count = 0;
@@ -333,11 +333,11 @@ function Plague_Skill(cp, epd, type, timer, max) {
                 if (timer%12 == 0)
                 {
                     //럴커 생성
-                    MoveLocation(tempLoc, skill_Unit_1, cp, centerLoc);
-                    sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, tempLoc, 0, 1);
-                    sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, tempLoc, 0, 1);
+                    MoveLocation(targetLoc_S, skill_Unit_1, cp, centerLoc);
+                    sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, targetLoc_S, 0, 1);
+                    sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, targetLoc_S, 0, 1);
                     //이펙트 유닛
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                     KillUnit(effect_Unit, cp);
                     temp_Count += 2;
                 }
@@ -356,11 +356,11 @@ function Plague_Skill(cp, epd, type, timer, max) {
                 var attempt = 0;
                 while (temp_Count > 0) {
                     RemoveUnit(0, P12);
-                    MoveLocation(tempLoc, skill_Unit_2, cp, centerLoc);
-                    RemoveUnitAt(1, skill_Unit_2, tempLoc, cp);
-                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
-                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    MoveLocation(targetLoc_S, skill_Unit_2, cp, centerLoc);
+                    RemoveUnitAt(1, skill_Unit_2, targetLoc_S, cp);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 8);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 8);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                     temp_Count -= 1;
                     attempt += 1;
                     if (attempt > 250) break;
@@ -392,9 +392,9 @@ function Plague_Skill(cp, epd, type, timer, max) {
                 for (var i = 0; i < 2; i++) {
                     if (plague_Curruption_Count < 6)
                     {
-                        setloc(tempLoc, x + dd.shape_Cross_dx[i*2], y + dd.shape_Cross_dy[i*2]);
-                        const epd = sy.Unit_Create(cp, plague_Curruption, bufferLoc, tempLoc);
-                        const tepd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
+                        setloc(targetLoc_S, x + dd.shape_Cross_dx[i*2], y + dd.shape_Cross_dy[i*2]);
+                        const epd = sy.Unit_Create(cp, plague_Curruption, bufferLoc, targetLoc_S);
+                        const tepd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 8);
                         if (epd && tepd)
                         {
                             //둘다 문제 없이 생성될 때에만 그룹에 넣기
@@ -480,8 +480,8 @@ function Plague_Skill_Enhance(cp, epd, type, timer, max) {
             const x, y = getlocTL(heroLoc);
             setloc(searchLoc, x, y);
             dilateloc(searchLoc, 160, 160);
-            MoveLocation(targetLoc, "Men", NonAlliedVictoryPlayers, searchLoc);
-            Order(skill_Unit_1, cp, centerLoc, Move, targetLoc);
+            MoveLocation(targetLoc_F, "Men", NonAlliedVictoryPlayers, searchLoc);
+            Order(skill_Unit_1, cp, centerLoc, Move, targetLoc_F);
             if (timer == 0)
             {
                 temp_Count = 0;
@@ -492,11 +492,11 @@ function Plague_Skill_Enhance(cp, epd, type, timer, max) {
                 if (timer%12 == 0)
                 {
                     //럴커 생성
-                    MoveLocation(tempLoc, skill_Unit_1, cp, centerLoc);
-                    sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, tempLoc, 0, 1);
-                    sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, tempLoc, 0, 1);
+                    MoveLocation(targetLoc_S, skill_Unit_1, cp, centerLoc);
+                    sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, targetLoc_S, 0, 1);
+                    sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, targetLoc_S, 0, 1);
                     //이펙트 유닛
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                     KillUnit(effect_Unit, cp);
                     temp_Count += 2;
                 }
@@ -515,12 +515,12 @@ function Plague_Skill_Enhance(cp, epd, type, timer, max) {
                 var attempt = 0;
                 while (temp_Count > 0) {
                     RemoveUnit(0, P12);
-                    MoveLocation(tempLoc, skill_Unit_2, cp, centerLoc);
-                    RemoveUnitAt(1, skill_Unit_2, tempLoc, cp);
-                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
-                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
-                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    MoveLocation(targetLoc_S, skill_Unit_2, cp, centerLoc);
+                    RemoveUnitAt(1, skill_Unit_2, targetLoc_S, cp);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 8);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 8);
+                    sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 8);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                     temp_Count -= 1;
                     attempt += 1;
                     if (attempt > 300) {
@@ -555,9 +555,9 @@ function Plague_Skill_Enhance(cp, epd, type, timer, max) {
                 for (var i = 0; i < 4; i++) {
                     if (plague_Curruption_Count < 9)
                     {
-                        setloc(tempLoc, x + dd.shape_Cross_dx[i], y + dd.shape_Cross_dy[i]);
-                        const epd = sy.Unit_Create(cp, plague_Curruption, bufferLoc, tempLoc);
-                        const tepd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 8);
+                        setloc(targetLoc_S, x + dd.shape_Cross_dx[i], y + dd.shape_Cross_dy[i]);
+                        const epd = sy.Unit_Create(cp, plague_Curruption, bufferLoc, targetLoc_S);
+                        const tepd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 8);
                         if (epd && tepd)
                         {
                             //둘다 문제 없이 생성될 때에만 그룹에 넣기
@@ -694,37 +694,37 @@ function Plague_MinionSkill(cp, cunit: CUnit, type) {
     if (Plague_GroupControl & 1)
     {
         //W스킬 소환
-        cunit.setloc(tempLoc);
+        cunit.setloc(targetLoc_S);
         skill_Unit_3_Weapon.damage = 22;
         skill_Unit_3_Weapon.damageBonus = 6;
         const image_OriginId = effect_Unit_Sprite.image;
         effect_Unit_Sprite.image = sc.image_Scourge;
-        sy.Unit_Create_Sudden(cp, skill_Unit_3, bufferLoc, tempLoc, 8);
-        sy.Unit_Create_Sudden(cp, skill_Unit_3, bufferLoc, tempLoc, 8);
-        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+        sy.Unit_Create_Sudden(cp, skill_Unit_3, bufferLoc, targetLoc_S, 8);
+        sy.Unit_Create_Sudden(cp, skill_Unit_3, bufferLoc, targetLoc_S, 8);
+        sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
         effect_Unit_Sprite.image = image_OriginId;
         KillUnit(effect_Unit, cp);
     }
     if (Plague_GroupControl & 128)
     {
         //W스킬 소환
-        cunit.setloc(tempLoc);
+        cunit.setloc(targetLoc_S);
         skill_Unit_3_Weapon.damage = 22;
         skill_Unit_3_Weapon.damageBonus = 6;
         const image_OriginId = effect_Unit_Sprite.image;
         effect_Unit_Sprite.image = sc.image_Scourge;
-        sy.Unit_Create_Sudden(cp, skill_Unit_3, bufferLoc, tempLoc, 8);
-        sy.Unit_Create_Sudden(cp, skill_Unit_3, bufferLoc, tempLoc, 8);
-        sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, tempLoc, 18, 1);
-        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+        sy.Unit_Create_Sudden(cp, skill_Unit_3, bufferLoc, targetLoc_S, 8);
+        sy.Unit_Create_Sudden(cp, skill_Unit_3, bufferLoc, targetLoc_S, 8);
+        sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, targetLoc_S, 18, 1);
+        sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
         effect_Unit_Sprite.image = image_OriginId;
         KillUnit(effect_Unit, cp);
     }
     if (Plague_GroupControl & 2)
     {
         //W-Q-Q이레딧
-        cunit.setloc(tempLoc);
-        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, tempLoc, 12);
+        cunit.setloc(targetLoc_S);
+        const epd = sy.Unit_Create_Sudden(cp, skill_Unit_1, bufferLoc, targetLoc_S, 12);
         const tcunit = CUnit(epd);
         tcunit.orderTarget = cunit;
         tcunit.orderID = 10;
@@ -744,16 +744,16 @@ function Plague_MinionSkill(cp, cunit: CUnit, type) {
         //하수인 분열!
         if (minion_Cur < minion_Limit)
         {
-            cunit.setloc(tempLoc);
+            cunit.setloc(targetLoc_S);
             const curHp = cunit.hp;
-            RemoveUnitAt(1, plague_Minion_Unit, tempLoc, cp);
+            RemoveUnitAt(1, plague_Minion_Unit, targetLoc_S, cp);
             //거점 할당 삭제
             if (type < 4)
             {
                 FOB_Count[type] -= 1;
             }
             for (var i = 0; i < 2; i++) {
-                const epd = sy.Unit_Create(cp, plague_Minion_Unit, bufferLoc, tempLoc);
+                const epd = sy.Unit_Create(cp, plague_Minion_Unit, bufferLoc, targetLoc_S);
                 const tcunit = CUnit(epd);
                 tcunit.hp = curHp/2;
                 tcunit.unknown0x86 = 4;
@@ -763,7 +763,7 @@ function Plague_MinionSkill(cp, cunit: CUnit, type) {
                 }
             }
             //이펙트
-            sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+            sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
             KillUnit(effect_Unit, cp);
             minion_Cur += 2;
             return true;
@@ -774,16 +774,16 @@ function Plague_MinionSkill(cp, cunit: CUnit, type) {
         //하수인 3배 분열!
         if (minion_Cur < minion_Limit-1)
         {
-            cunit.setloc(tempLoc);
+            cunit.setloc(targetLoc_S);
             const curHp = cunit.hp;
-            RemoveUnitAt(1, plague_Minion_Unit, tempLoc, cp);
+            RemoveUnitAt(1, plague_Minion_Unit, targetLoc_S, cp);
             //거점 할당 삭제
             if (type < 4)
             {
                 FOB_Count[type] -= 1;
             }
             for (var i = 0; i < 3; i++) {
-                const epd = sy.Unit_Create(cp, plague_Minion_Unit, bufferLoc, tempLoc);
+                const epd = sy.Unit_Create(cp, plague_Minion_Unit, bufferLoc, targetLoc_S);
                 const tcunit = CUnit(epd);
                 tcunit.hp = curHp/3;
                 tcunit.unknown0x86 = 4;
@@ -793,7 +793,7 @@ function Plague_MinionSkill(cp, cunit: CUnit, type) {
                 }
             }
             //이펙트
-            sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+            sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
             KillUnit(effect_Unit, cp);
             minion_Cur += 3;
             return true;
@@ -802,10 +802,10 @@ function Plague_MinionSkill(cp, cunit: CUnit, type) {
     if (Plague_GroupControl & 32)
     {
         //하수인 회복
-        cunit.setloc(tempLoc);
+        cunit.setloc(targetLoc_S);
         const image_OriginId = effect_Unit_Sprite.image;
         effect_Unit_Sprite.image = sc.image_Bengal;
-        sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+        sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
         KillUnit(effect_Unit, cp);
         sy.Unit_Healing_Percent(cunit, cp, 100);
     }
@@ -847,19 +847,19 @@ function Plague_UnitGroup(cp, minion_order) {
                     const angle = sy.GetExtraDb(cunit, 1);
                     const dx, dy = lengthdir(120, angle);
                     const x, y = cunit.posX, cunit.posY;
-                    setloc(tempLoc, x, y);
+                    setloc(targetLoc_S, x, y);
                     setloc(minionLoc, x + dx, y + dy);
-                    Order(skill_Unit_1, cp, tempLoc, Move, minionLoc);
+                    Order(skill_Unit_1, cp, targetLoc_S, Move, minionLoc);
                     //따로
                     sy.ExtraSubDb(cunit, 2, 1);
-                    sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, tempLoc, 0, 1);
+                    sy.Unit_Create_Special(cp, skill_Unit_2, bufferLoc, targetLoc_S, 0, 1);
                     //이펙트 유닛
-                    sy.Unit_Create(cp, effect_Unit, bufferLoc, tempLoc);
+                    sy.Unit_Create(cp, effect_Unit, bufferLoc, targetLoc_S);
                     KillUnit(effect_Unit, cp);
                     temp_Count += 1;
                 } else {
-                    cunit.setloc(tempLoc);
-                    Order(skill_Unit_1, cp, tempLoc, Move, tempLoc);
+                    cunit.setloc(targetLoc_S);
+                    Order(skill_Unit_1, cp, targetLoc_S, Move, targetLoc_S);
                 }
             } else {
                 cunit.unknown0x8C -= 1;
@@ -879,11 +879,11 @@ function Plague_UnitGroup(cp, minion_order) {
             if (Plague_SkillControl & 1)
             {
                 //3개로 분열하기
-                cunit.setloc(tempLoc);
-                RemoveUnitAt(1, skill_Unit_1, tempLoc, cp);
+                cunit.setloc(targetLoc_S);
+                RemoveUnitAt(1, skill_Unit_1, targetLoc_S, cp);
                 const angle = rand()%120;
                 for (var j = 0; j < 3; j++) {
-                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, tempLoc);
+                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, targetLoc_S);
                     bwrite_epd(epd + 0x84/4, 2, 1);
                     wwrite_epd(epd + 0x8C/4, 0, 0);
                     sy.SetExtraDb(epd, 0, 5);
@@ -895,11 +895,11 @@ function Plague_UnitGroup(cp, minion_order) {
             if (Plague_SkillControl & 2)
             {
                 //4개로 분열하기
-                cunit.setloc(tempLoc);
-                RemoveUnitAt(1, skill_Unit_1, tempLoc, cp);
+                cunit.setloc(targetLoc_S);
+                RemoveUnitAt(1, skill_Unit_1, targetLoc_S, cp);
                 const angle = rand()%90;
                 for (var j = 0; j < 4; j++) {
-                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, tempLoc);
+                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, targetLoc_S);
                     bwrite_epd(epd + 0x84/4, 2, 1);
                     wwrite_epd(epd + 0x8C/4, 0, 0);
                     sy.SetExtraDb(epd, 0, 5);
@@ -914,11 +914,11 @@ function Plague_UnitGroup(cp, minion_order) {
             if (Plague_SkillControl & 4)
             {
                 //3개로 분열하기
-                cunit.setloc(tempLoc);
-                // RemoveUnitAt(1, plague_Curruption, tempLoc, cp);
+                cunit.setloc(targetLoc_S);
+                // RemoveUnitAt(1, plague_Curruption, targetLoc_S, cp);
                 const angle = rand()%120;
                 for (var j = 0; j < 3; j++) {
-                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, tempLoc);
+                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, targetLoc_S);
                     bwrite_epd(epd + 0x84/4, 2, 1);
                     wwrite_epd(epd + 0x8C/4, 0, 0);
                     sy.SetExtraDb(epd, 0, 5);
@@ -930,11 +930,11 @@ function Plague_UnitGroup(cp, minion_order) {
             if (Plague_SkillControl & 8)
             {
                 //4개로 분열하기
-                cunit.setloc(tempLoc);
-                // RemoveUnitAt(1, plague_Curruption, tempLoc, cp);
+                cunit.setloc(targetLoc_S);
+                // RemoveUnitAt(1, plague_Curruption, targetLoc_S, cp);
                 const angle = rand()%90;
                 for (var j = 0; j < 4; j++) {
-                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, tempLoc);
+                    const epd = sy.Unit_Create(cp, skill_Unit_1, bufferLoc, targetLoc_S);
                     bwrite_epd(epd + 0x84/4, 2, 1);
                     wwrite_epd(epd + 0x8C/4, 0, 0);
                     sy.SetExtraDb(epd, 0, 5);
@@ -1044,22 +1044,22 @@ function Plague_UnitGroup(cp, minion_order) {
             //마우스 위치에 집결
             const tx = sy.GetExtraDb(cunit, 1);
             const ty = sy.GetExtraDb(cunit, 2);
-            setloc(tempLoc, tx, ty);
+            setloc(targetLoc_S, tx, ty);
             cunit.setloc(minionLoc);
             //집결 명령 하달
             if (timer == 0)
             {
                 cunit.unknown0x8C = 24;
-                Order(plague_Minion_Unit, cp, minionLoc, Move, tempLoc);
+                Order(plague_Minion_Unit, cp, minionLoc, Move, targetLoc_S);
                 cunit.remove_collision();
             } else {
                 cunit.unknown0x8C -= 1;
             }
-            if (sy.LocationDistance(minionLoc, tempLoc) < 128)
+            if (sy.LocationDistance(minionLoc, targetLoc_S) < 128)
             {
                 cunit.unknown0x86 = 2;
                 cunit.unknown0x8C = 6;
-                Order(plague_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                Order(plague_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                 cunit.set_collision();
             }
         }
@@ -1132,19 +1132,19 @@ function Plague_UnitGroup(cp, minion_order) {
             {
                 //거점 위치랑 거리 비교
                 const tx, ty = posread_epd(FOB_Epd[0] + 0x28/4);
-                setloc(tempLoc, tx, ty);
+                setloc(targetLoc_S, tx, ty);
                 cunit.setloc(minionLoc);
-                if (sy.LocationDistance(minionLoc, tempLoc) > 160)
+                if (sy.LocationDistance(minionLoc, targetLoc_S) > 160)
                 {
                     //거점에서 멀어지면 강제 이동
                     cunit.unknown0x86 = 1;
                     cunit.unknown0x8C = 24;
-                    Order(plague_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                    Order(plague_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                     cunit.set_collision();
                 } else {
                     //거점 안이면 오더만 갱신
                     cunit.unknown0x8C = 24;
-                    Order(plague_Minion_Unit, cp, minionLoc, Patrol, tempLoc);
+                    Order(plague_Minion_Unit, cp, minionLoc, Patrol, targetLoc_S);
                 }
             } else {
                 cunit.unknown0x8C -= 1;
@@ -1154,22 +1154,22 @@ function Plague_UnitGroup(cp, minion_order) {
         {
             //거점 위치랑 너무 멀어지면 강제 이동
             const tx, ty = posread_epd(FOB_Epd[0] + 0x28/4);
-            setloc(tempLoc, tx, ty);
+            setloc(targetLoc_S, tx, ty);
             cunit.setloc(minionLoc);
             //집결 명령 하달
             if (timer == 0)
             {
                 cunit.unknown0x8C = 24;
-                Order(plague_Minion_Unit, cp, minionLoc, Move, tempLoc);
+                Order(plague_Minion_Unit, cp, minionLoc, Move, targetLoc_S);
                 cunit.remove_collision();
             } else {
                 cunit.unknown0x8C -= 1;
             }
-            if (sy.LocationDistance(minionLoc, tempLoc) < 160)
+            if (sy.LocationDistance(minionLoc, targetLoc_S) < 160)
             {
                 cunit.unknown0x86 = 0;
                 cunit.unknown0x8C = 24;
-                Order(plague_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                Order(plague_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                 cunit.set_collision();
             }
         }
@@ -1203,19 +1203,19 @@ function Plague_UnitGroup(cp, minion_order) {
             {
                 //거점 위치랑 거리 비교
                 const tx, ty = posread_epd(FOB_Epd[1] + 0x28/4);
-                setloc(tempLoc, tx, ty);
+                setloc(targetLoc_S, tx, ty);
                 cunit.setloc(minionLoc);
-                if (sy.LocationDistance(minionLoc, tempLoc) > 160)
+                if (sy.LocationDistance(minionLoc, targetLoc_S) > 160)
                 {
                     //거점에서 멀어지면 강제 이동
                     cunit.unknown0x86 = 1;
                     cunit.unknown0x8C = 24;
-                    Order(plague_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                    Order(plague_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                     cunit.set_collision();
                 } else {
                     //거점 안이면 오더만 갱신
                     cunit.unknown0x8C = 24;
-                    Order(plague_Minion_Unit, cp, minionLoc, Patrol, tempLoc);
+                    Order(plague_Minion_Unit, cp, minionLoc, Patrol, targetLoc_S);
                 }
             } else {
                 cunit.unknown0x8C -= 1;
@@ -1225,22 +1225,22 @@ function Plague_UnitGroup(cp, minion_order) {
         {
             //거점 위치랑 너무 멀어지면 강제 이동
             const tx, ty = posread_epd(FOB_Epd[1] + 0x28/4);
-            setloc(tempLoc, tx, ty);
+            setloc(targetLoc_S, tx, ty);
             cunit.setloc(minionLoc);
             //집결 명령 하달
             if (timer == 0)
             {
                 cunit.unknown0x8C = 24;
-                Order(plague_Minion_Unit, cp, minionLoc, Move, tempLoc);
+                Order(plague_Minion_Unit, cp, minionLoc, Move, targetLoc_S);
                 cunit.remove_collision();
             } else {
                 cunit.unknown0x8C -= 1;
             }
-            if (sy.LocationDistance(minionLoc, tempLoc) < 160)
+            if (sy.LocationDistance(minionLoc, targetLoc_S) < 160)
             {
                 cunit.unknown0x86 = 0;
                 cunit.unknown0x8C = 24;
-                Order(plague_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                Order(plague_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                 cunit.set_collision();
             }
         }
@@ -1274,19 +1274,19 @@ function Plague_UnitGroup(cp, minion_order) {
             {
                 //거점 위치랑 거리 비교
                 const tx, ty = posread_epd(FOB_Epd[2] + 0x28/4);
-                setloc(tempLoc, tx, ty);
+                setloc(targetLoc_S, tx, ty);
                 cunit.setloc(minionLoc);
-                if (sy.LocationDistance(minionLoc, tempLoc) > 160)
+                if (sy.LocationDistance(minionLoc, targetLoc_S) > 160)
                 {
                     //거점에서 멀어지면 강제 이동
                     cunit.unknown0x86 = 1;
                     cunit.unknown0x8C = 24;
-                    Order(plague_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                    Order(plague_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                     cunit.set_collision();
                 } else {
                     //거점 안이면 오더만 갱신
                     cunit.unknown0x8C = 24;
-                    Order(plague_Minion_Unit, cp, minionLoc, Patrol, tempLoc);
+                    Order(plague_Minion_Unit, cp, minionLoc, Patrol, targetLoc_S);
                 }
             } else {
                 cunit.unknown0x8C -= 1;
@@ -1296,22 +1296,22 @@ function Plague_UnitGroup(cp, minion_order) {
         {
             //거점 위치랑 너무 멀어지면 강제 이동
             const tx, ty = posread_epd(FOB_Epd[2] + 0x28/4);
-            setloc(tempLoc, tx, ty);
+            setloc(targetLoc_S, tx, ty);
             cunit.setloc(minionLoc);
             //집결 명령 하달
             if (timer == 0)
             {
                 cunit.unknown0x8C = 24;
-                Order(plague_Minion_Unit, cp, minionLoc, Move, tempLoc);
+                Order(plague_Minion_Unit, cp, minionLoc, Move, targetLoc_S);
                 cunit.remove_collision();
             } else {
                 cunit.unknown0x8C -= 1;
             }
-            if (sy.LocationDistance(minionLoc, tempLoc) < 160)
+            if (sy.LocationDistance(minionLoc, targetLoc_S) < 160)
             {
                 cunit.unknown0x86 = 0;
                 cunit.unknown0x8C = 24;
-                Order(plague_Minion_Unit, cp, minionLoc, Attack, tempLoc);
+                Order(plague_Minion_Unit, cp, minionLoc, Attack, targetLoc_S);
                 cunit.set_collision();
             }
         }

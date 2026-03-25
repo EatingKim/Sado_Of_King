@@ -8,10 +8,7 @@ import TriggerEditor.TETools as TE;
 import System as sy;
 import ArrayPool as ap;
 
-const targetLoc = $L("Target");
-const bufferLoc = $L("Buffer");
-const searchLoc = $L("Skill_Range");
-const heroLoc = $L("Hero");
+const heroLoc = $L("Hero_Death");
 var Index = 0;
 
 function Skill_Upgrade_Check(cp);
@@ -140,7 +137,7 @@ function Hero_Play(cp) {
     //죽어있다면 실행하지 않음
     if (sado.isAlive == 0) return;
     //영웅에게 로케이션 이동
-    MoveLocation(heroLoc, 0, cp, "Anywhere");
+    MoveLocation(heroLoc + sado.type, 0, cp, "Anywhere");
     //스킬 발동 확인
     Sado_SKill(cp);
     switch (sado.type) {
@@ -208,37 +205,5 @@ function Hero_InputCheck(cp, input) {
     }
 }
 
-const skillUp_Main_loc = $L("Skill_Main");
-const skillUp_Q_loc = $L("Skill_Up_Q");
-const skillUp_W_loc = $L("Skill_Up_W");
-const skillUp_E_loc = $L("Skill_Up_E");
-const skillUp_R_loc = $L("Skill_Up_R");
-
 function Skill_Upgrade_Check(cp) {
-    const sado = sdo.Sado.cast(sado_Main[cp]);
-
-    for (var i = 0; i < 4; i++) {
-        if (Bring(cp, AtLeast, 1, "Men", skillUp_Q_loc+i))
-        {
-            MoveUnit(1, "Men", cp, skillUp_Q_loc+i, skillUp_Main_loc);
-            sado.Skill_Enhance(1+i);
-        }
-        if (Bring(cp, AtLeast, 1, "Men", skillUp_W_loc+i))
-        {
-            MoveUnit(1, "Men", cp, skillUp_W_loc+i, skillUp_Main_loc);
-            sado.Skill_Enhance(5+i);
-        }
-    }
-    for (var i = 0; i < 2; i++) {
-        if (Bring(cp, AtLeast, 1, "Men", skillUp_E_loc+i))
-        {
-            MoveUnit(1, "Men", cp, skillUp_E_loc+i, skillUp_Main_loc);
-            sado.Skill_Enhance(9+i);
-        }
-    }
-    if (Bring(cp, AtLeast, 1, "Men", skillUp_R_loc))
-    {
-        MoveUnit(1, "Men", cp, skillUp_R_loc, skillUp_Main_loc);
-        sado.Skill_Enhance(11);
-    }
 }
